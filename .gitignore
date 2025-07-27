@@ -7,3 +7,4 @@ application/config/config.php
 application/config/database.php
 .DS_Store
 /cache
+/assets/images
