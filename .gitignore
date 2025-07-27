@@ -2,6 +2,8 @@
 /uploads/*.jpg
 /uploads/*.png
 /uploads/*.jpeg
+/assets/images/*.jpg
 application/config/config.php
 application/config/database.php
 .DS_Store
+/cache
