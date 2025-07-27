@@ -1,22 +1,25 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Users extends CI_Controller {
+class Users extends CI_Controller
+{
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->load->model('m_user');
         $this->load->library(['bcrypt', 'form_validation', 'upload']);
         $this->load->helper(['form', 'url', 'file']);
         date_default_timezone_set("Asia/Jakarta");
-        
+
         // Check if user is logged in for all methods except login
         if (!$this->session->userdata('userlogin')) {
             redirect('auth/login');
         }
     }
 
-    public function index() {
+    public function index()
+    {
         try {
             $data = [
                 'set' => 'list-users',
@@ -29,16 +32,18 @@ class Users extends CI_Controller {
             show_error('Terjadi kesalahan saat memuat data users');
         }
     }
-    
-    public function add() {
+
+    public function add()
+    {
         $data = [
             'set' => 'add-users',
             'title' => 'Tambah User'
         ];
         $this->load->view('i_users', $data);
     }
-    
-    public function save() {
+
+    public function save()
+    {
         // Set validation rules
         $this->form_validation->set_rules('nama', 'Nama', 'required|trim|max_length[100]');
         $this->form_validation->set_rules('email', 'Email', 'required|valid_email|is_unique[user.email]');
@@ -46,6 +51,7 @@ class Users extends CI_Controller {
         $this->form_validation->set_rules('password', 'Password', 'required|min_length[6]');
 
         if ($this->form_validation->run() == FALSE) {
+            set_old_input($this->input->post());
             $this->session->set_flashdata('error', validation_errors());
             redirect('users/add');
             return;
@@ -53,7 +59,7 @@ class Users extends CI_Controller {
 
         try {
             $avatar_name = $this->_handle_image_upload();
-            
+
             if ($avatar_name === false) {
                 redirect('users/add');
                 return;
@@ -74,7 +80,6 @@ class Users extends CI_Controller {
             } else {
                 $this->session->set_flashdata('error', 'Gagal menambahkan user');
             }
-
         } catch (Exception $e) {
             log_message('error', 'Error in Users::save() - ' . $e->getMessage());
             $this->session->set_flashdata('error', 'Terjadi kesalahan saat menyimpan data');
@@ -82,15 +87,16 @@ class Users extends CI_Controller {
 
         redirect('users');
     }
-    
-    public function edit($id = null) {
+
+    public function edit($id = null)
+    {
         if (!$id || !is_numeric($id)) {
             show_404();
         }
 
         try {
             $user = $this->m_user->get_user_by_id($id);
-            
+
             if (!$user) {
                 $this->session->set_flashdata('error', 'User tidak ditemukan');
                 redirect('users');
@@ -102,18 +108,18 @@ class Users extends CI_Controller {
                 'user' => $user,
                 'title' => 'Edit User'
             ];
-            
-            $this->load->view('i_users', $data);
 
+            $this->load->view('i_users', $data);
         } catch (Exception $e) {
             log_message('error', 'Error in Users::edit() - ' . $e->getMessage());
             show_error('Terjadi kesalahan saat memuat data user');
         }
     }
-    
-    public function update() {
+
+    public function update()
+    {
         $id = $this->input->post('id');
-        
+
         if (!$id || !is_numeric($id)) {
             show_404();
         }
@@ -122,7 +128,7 @@ class Users extends CI_Controller {
         $this->form_validation->set_rules('nama', 'Nama', 'required|trim|max_length[100]');
         $this->form_validation->set_rules('email', 'Email', 'required|valid_email|callback__check_email_unique[' . $id . ']');
         $this->form_validation->set_rules('username', 'Username', 'required|trim|min_length[4]|max_length[50]|callback__check_username_unique[' . $id . ']');
-        
+
         if ($this->input->post('password')) {
             $this->form_validation->set_rules('password', 'Password', 'min_length[6]');
         }
@@ -167,7 +173,6 @@ class Users extends CI_Controller {
             } else {
                 $this->session->set_flashdata('error', 'Gagal mengupdate user');
             }
-
         } catch (Exception $e) {
             log_message('error', 'Error in Users::update() - ' . $e->getMessage());
             $this->session->set_flashdata('error', 'Terjadi kesalahan saat mengupdate data');
@@ -175,8 +180,9 @@ class Users extends CI_Controller {
 
         redirect('users');
     }
-    
-    public function delete($id = null) {
+
+    public function delete($id = null)
+    {
         if (!$id || !is_numeric($id)) {
             show_404();
         }
@@ -190,7 +196,7 @@ class Users extends CI_Controller {
 
         try {
             $user = $this->m_user->get_user_by_id($id);
-            
+
             if (!$user) {
                 $this->session->set_flashdata('error', 'User tidak ditemukan');
                 redirect('users');
@@ -207,7 +213,6 @@ class Users extends CI_Controller {
             } else {
                 $this->session->set_flashdata('error', 'Gagal menghapus user');
             }
-
         } catch (Exception $e) {
             log_message('error', 'Error in Users::delete() - ' . $e->getMessage());
             $this->session->set_flashdata('error', 'Terjadi kesalahan saat menghapus data');
@@ -217,7 +222,8 @@ class Users extends CI_Controller {
     }
 
     // Private methods
-    private function _handle_image_upload() {
+    private function _handle_image_upload()
+    {
         if (empty($_FILES['image']['name'])) {
             return 'default.png';
         }
@@ -225,7 +231,7 @@ class Users extends CI_Controller {
         $config = [
             'upload_path' => './assets/images/',
             'allowed_types' => 'gif|jpg|jpeg|png',
-            
+
             'file_name' => uniqid() . '_' . time()
         ];
 
@@ -240,7 +246,8 @@ class Users extends CI_Controller {
         }
     }
 
-    private function _delete_image($filename) {
+    private function _delete_image($filename)
+    {
         $path = './assets/images/' . $filename;
         if (file_exists($path)) {
             unlink($path);
@@ -248,7 +255,8 @@ class Users extends CI_Controller {
     }
 
     // Custom validation callbacks
-    public function _check_email_unique($email, $id) {
+    public function _check_email_unique($email, $id)
+    {
         if ($this->m_user->is_email_exists($email, $id)) {
             $this->form_validation->set_message('_check_email_unique', 'Email sudah digunakan');
             return false;
@@ -256,7 +264,8 @@ class Users extends CI_Controller {
         return true;
     }
 
-    public function _check_username_unique($username, $id) {
+    public function _check_username_unique($username, $id)
+    {
         if ($this->m_user->is_username_exists($username, $id)) {
             $this->form_validation->set_message('_check_username_unique', 'Username sudah digunakan');
             return false;

@@ -1,7 +1,8 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class M_user extends CI_Model {
+class M_user extends CI_Model
+{
 
     private $table = 'user';
     private $primary_key = 'id_user';
@@ -9,10 +10,11 @@ class M_user extends CI_Model {
     /**
      * Get all users with optional filters
      */
-    public function get_users($limit = null, $offset = null, $search = null) {
+    public function get_users($limit = null, $offset = null, $search = null)
+    {
         $this->db->select('*');
         $this->db->from($this->table);
-        
+
         if ($search) {
             $this->db->group_start();
             $this->db->like('nama', $search);
@@ -20,13 +22,13 @@ class M_user extends CI_Model {
             $this->db->or_like('username', $search);
             $this->db->group_end();
         }
-        
+
         $this->db->order_by($this->primary_key, 'DESC');
-        
+
         if ($limit) {
             $this->db->limit($limit, $offset);
         }
-        
+
         $query = $this->db->get();
         return $query->num_rows() > 0 ? $query->result() : [];
     }
@@ -34,7 +36,8 @@ class M_user extends CI_Model {
     /**
      * Get user by ID
      */
-    public function get_user_by_id($id) {
+    public function get_user_by_id($id)
+    {
         if (!$id || !is_numeric($id)) {
             return false;
         }
@@ -43,7 +46,7 @@ class M_user extends CI_Model {
         $this->db->from($this->table);
         $this->db->where($this->primary_key, $id);
         $this->db->limit(1);
-        
+
         $query = $this->db->get();
         return $query->num_rows() > 0 ? $query->row() : false;
     }
@@ -51,7 +54,8 @@ class M_user extends CI_Model {
     /**
      * Get user by username
      */
-    public function get_user_by_username($username) {
+    public function get_user_by_username($username)
+    {
         if (!$username) {
             return false;
         }
@@ -60,7 +64,7 @@ class M_user extends CI_Model {
         $this->db->from($this->table);
         $this->db->where('username', $username);
         $this->db->limit(1);
-        
+
         $query = $this->db->get();
         return $query->num_rows() > 0 ? $query->row() : false;
     }
@@ -68,7 +72,8 @@ class M_user extends CI_Model {
     /**
      * Get user by email
      */
-    public function get_user_by_email($email) {
+    public function get_user_by_email($email)
+    {
         if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return false;
         }
@@ -77,7 +82,7 @@ class M_user extends CI_Model {
         $this->db->from($this->table);
         $this->db->where('email', $email);
         $this->db->limit(1);
-        
+
         $query = $this->db->get();
         return $query->num_rows() > 0 ? $query->row() : false;
     }
@@ -85,7 +90,8 @@ class M_user extends CI_Model {
     /**
      * Insert new user
      */
-    public function insert_user($data) {
+    public function insert_user($data)
+    {
         // Validate required fields
         $required_fields = ['nama', 'email', 'username', 'password'];
         foreach ($required_fields as $field) {
@@ -99,29 +105,33 @@ class M_user extends CI_Model {
         if (!isset($data['avatar'])) {
             $data['avatar'] = 'default.png';
         }
-        
-        if (!isset($data['status'])) {
-            $data['status'] = 'active';
-        }
-        
-        if (!isset($data['created_at'])) {
-            $data['created_at'] = date('Y-m-d H:i:s');
-        }
+
+        // if (!isset($data['status'])) {
+        //     $data['status'] = 'active';
+        // }
+
+        // if (!isset($data['created_at'])) {
+        //     $data['created_at'] = date('Y-m-d H:i:s');
+        // }
+
+        unset($data['status']);
+        unset($data['created_at']);
 
         try {
             $this->db->trans_begin();
             $this->db->insert($this->table, $data);
-            
+
             if ($this->db->trans_status() === FALSE) {
                 $this->db->trans_rollback();
                 return false;
             }
-            
+
             $this->db->trans_commit();
             return $this->db->insert_id();
-            
         } catch (Exception $e) {
             $this->db->trans_rollback();
+
+            dd($e->getMessage());
             log_message('error', 'Error inserting user: ' . $e->getMessage());
             return false;
         }
@@ -130,29 +140,29 @@ class M_user extends CI_Model {
     /**
      * Update user data
      */
-    public function update_user($id, $data) {
+    public function update_user($id, $data)
+    {
         if (!$id || !is_numeric($id) || empty($data)) {
             return false;
         }
 
         // Set updated timestamp
-        $data['updated_at'] = date('Y-m-d H:i:s');
+        // $data['updated_at'] = date('Y-m-d H:i:s');
+        unset($data['updated_at']);
 
         try {
             $this->db->trans_begin();
             $this->db->where($this->primary_key, $id);
             $this->db->update($this->table, $data);
-            
+
             if ($this->db->trans_status() === FALSE || $this->db->affected_rows() == 0) {
                 $this->db->trans_rollback();
                 return false;
             }
-            
+
             $this->db->trans_commit();
             return true;
-            
         } catch (Exception $e) {
-            $this->db->trans_rollback();
             log_message('error', 'Error updating user: ' . $e->getMessage());
             return false;
         }
@@ -161,7 +171,8 @@ class M_user extends CI_Model {
     /**
      * Delete user
      */
-    public function delete_user($id) {
+    public function delete_user($id)
+    {
         if (!$id || !is_numeric($id)) {
             return false;
         }
@@ -175,15 +186,14 @@ class M_user extends CI_Model {
             $this->db->trans_begin();
             $this->db->where($this->primary_key, $id);
             $this->db->delete($this->table);
-            
+
             if ($this->db->trans_status() === FALSE || $this->db->affected_rows() == 0) {
                 $this->db->trans_rollback();
                 return false;
             }
-            
+
             $this->db->trans_commit();
             return true;
-            
         } catch (Exception $e) {
             $this->db->trans_rollback();
             log_message('error', 'Error deleting user: ' . $e->getMessage());
@@ -194,17 +204,18 @@ class M_user extends CI_Model {
     /**
      * Check if username exists
      */
-    public function is_username_exists($username, $exclude_id = null) {
+    public function is_username_exists($username, $exclude_id = null)
+    {
         if (!$username) {
             return false;
         }
 
         $this->db->where('username', $username);
-        
+
         if ($exclude_id && is_numeric($exclude_id)) {
             $this->db->where($this->primary_key . ' !=', $exclude_id);
         }
-        
+
         $query = $this->db->get($this->table);
         return $query->num_rows() > 0;
     }
@@ -212,17 +223,18 @@ class M_user extends CI_Model {
     /**
      * Check if email exists
      */
-    public function is_email_exists($email, $exclude_id = null) {
+    public function is_email_exists($email, $exclude_id = null)
+    {
         if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return false;
         }
 
         $this->db->where('email', $email);
-        
+
         if ($exclude_id && is_numeric($exclude_id)) {
             $this->db->where($this->primary_key . ' !=', $exclude_id);
         }
-        
+
         $query = $this->db->get($this->table);
         return $query->num_rows() > 0;
     }
@@ -230,7 +242,8 @@ class M_user extends CI_Model {
     /**
      * Count total users
      */
-    public function count_users($search = null) {
+    public function count_users($search = null)
+    {
         if ($search) {
             $this->db->group_start();
             $this->db->like('nama', $search);
@@ -238,19 +251,20 @@ class M_user extends CI_Model {
             $this->db->or_like('username', $search);
             $this->db->group_end();
         }
-        
+
         return $this->db->count_all_results($this->table);
     }
 
     /**
      * Get active users only
      */
-    public function get_active_users() {
+    public function get_active_users()
+    {
         $this->db->select('*');
         $this->db->from($this->table);
         $this->db->where('status', 'active');
         $this->db->order_by($this->primary_key, 'DESC');
-        
+
         $query = $this->db->get();
         return $query->num_rows() > 0 ? $query->result() : [];
     }
@@ -258,7 +272,8 @@ class M_user extends CI_Model {
     /**
      * Update user status
      */
-    public function update_status($id, $status) {
+    public function update_status($id, $status)
+    {
         if (!$id || !is_numeric($id) || !in_array($status, ['active', 'inactive'])) {
             return false;
         }
@@ -274,7 +289,8 @@ class M_user extends CI_Model {
     /**
      * Update user password
      */
-    public function update_password($id, $new_password) {
+    public function update_password($id, $new_password)
+    {
         if (!$id || !is_numeric($id) || !$new_password) {
             return false;
         }
@@ -290,7 +306,8 @@ class M_user extends CI_Model {
     /**
      * Update user avatar
      */
-    public function update_avatar($id, $avatar_filename) {
+    public function update_avatar($id, $avatar_filename)
+    {
         if (!$id || !is_numeric($id) || !$avatar_filename) {
             return false;
         }
@@ -306,7 +323,8 @@ class M_user extends CI_Model {
     /**
      * Update last login timestamp
      */
-    public function update_last_login($id) {
+    public function update_last_login($id)
+    {
         if (!$id || !is_numeric($id)) {
             return false;
         }
@@ -321,14 +339,16 @@ class M_user extends CI_Model {
     /**
      * Get users with pagination
      */
-    public function get_users_paginated($limit, $offset, $search = null) {
+    public function get_users_paginated($limit, $offset, $search = null)
+    {
         return $this->get_users($limit, $offset, $search);
     }
 
     /**
      * Search users
      */
-    public function search_users($keyword) {
+    public function search_users($keyword)
+    {
         if (!$keyword) {
             return [];
         }
@@ -339,24 +359,25 @@ class M_user extends CI_Model {
     /**
      * Get user statistics
      */
-    public function get_user_stats() {
+    public function get_user_stats()
+    {
         $stats = [];
-        
+
         // Total users
         $stats['total'] = $this->db->count_all($this->table);
-        
+
         // Active users
         $this->db->where('status', 'active');
         $stats['active'] = $this->db->count_all_results($this->table);
-        
+
         // Inactive users
         $stats['inactive'] = $stats['total'] - $stats['active'];
-        
+
         // Users registered this month
         $this->db->where('MONTH(created_at)', date('m'));
         $this->db->where('YEAR(created_at)', date('Y'));
         $stats['this_month'] = $this->db->count_all_results($this->table);
-        
+
         return $stats;
     }
 }
