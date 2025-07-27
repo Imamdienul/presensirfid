@@ -1,3 +1,2 @@
-# PRESENSIRFID
-
-Test update readme file
+# absensimtsn11majalengka
+Aplikasi Absensi RFID MTsN 11 Majalengka
