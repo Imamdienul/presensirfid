@@ -1,12 +1,12 @@
 <?php
 if (!$this->session->userdata('userlogin')) { // Mencegah akses tanpa login
     $this->session->set_flashdata(
-        "pesan", 
+        "pesan",
         "<div class=\"alert alert-danger\" id=\"alert\">
             <i class=\"glyphicon glyphicon-remove\"></i> Mohon Login terlebih dahulu
         </div>"
     );
-    redirect(base_url().'login');
+    redirect(base_url() . 'login');
 }
 
 $users = $this->session->userdata('userlogin');
@@ -39,7 +39,7 @@ $avatar = $this->session->userdata('avatar');
     <link rel="stylesheet" href="<?= base_url() ?>assets/plugins/datatables/responsive.bootstrap4.min.css" />
     <link rel="stylesheet" href="<?= base_url() ?>assets/plugins/animate/animate.css" />
     <link href="<?= base_url() ?>assets/plugins/c3/c3.min.css" rel="stylesheet">
-    
+
     <!-- Main CSS -->
     <link rel="stylesheet" href="<?= base_url() ?>assets/css/bootstrap-material-design.min.css" />
     <link rel="stylesheet" href="<?= base_url() ?>assets/css/icons.css" />
@@ -85,7 +85,7 @@ $avatar = $this->session->userdata('avatar');
             width: 100%;
             background: white;
             border-radius: 0 0 4px 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             max-height: 300px;
             overflow-y: auto;
             z-index: 1000;
@@ -289,16 +289,16 @@ $avatar = $this->session->userdata('avatar');
                         <!-- Notification Items -->
                         <ul class="list-inline float-right mb-0 mr-3">
                             <!-- Messages -->
-                            
+
 
                             <!-- User Profile -->
                             <li class="list-inline-item dropdown notification-list">
                                 <a class="nav-link dropdown-toggle arrow-none waves-effect nav-user" data-toggle="dropdown" href="#">
-                                    <img src="<?= base_url() ?>assets/images/<?= $this->session->userdata('avatar') ?>" alt="user">
+                                    <img src="<?= base_url() ?>assets/images/<?= $this->session->userdata('auth_user')->avatar ?: 'default.png' ?>" alt="user">
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right profile-dropdown">
                                     <div class="dropdown-item noti-title">
-                                        <h5><?= $this->session->userdata('userlogin') ?></h5>
+                                        <h5><?= $this->session->userdata('auth_user')->nama ?></h5>
                                     </div>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="<?= base_url() ?>login/logout">
@@ -318,4 +318,3 @@ $avatar = $this->session->userdata('avatar');
                         <div class="clearfix"></div>
                     </nav>
                 </div>
-                
