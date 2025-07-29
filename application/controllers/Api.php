@@ -14,6 +14,98 @@ class Api extends CI_Controller {
 	{
 		$this->load->view('i_api');
 	}
+
+	private function send_whatsapp_notification($phone_number, $message) {
+    $api_url = "https://api.fonnte.com/send";
+    
+    $token = "LiEZiCxNNFnG8s4djWxj";
+    
+    $phone_number = preg_replace('/[^0-9]/', '', $phone_number);
+    if (substr($phone_number, 0, 1) == '0') {
+        $phone_number = '62' . substr($phone_number, 1);
+    }
+    
+    $data = array(
+        'target' => $phone_number,
+        'message' => $message,
+        'countryCode' => '62' 
+    );
+    
+
+    $headers = array(
+        'Authorization: ' . $token,
+        'Content-Type: application/x-www-form-urlencoded'
+    );
+    
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $api_url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    
+ 
+    $result = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+    
+
+    if ($error) {
+        error_log("WhatsApp notification error: " . $error);
+    }
+    
+    return $result;
+}
+
+
+
+	private function create_whatsapp_message($nama_siswa, $keterangan, $waktu, $is_manual = false) {
+		$waktu_formatted = date('d/m/Y H:i:s', $waktu);
+		$hari = date('l', $waktu);
+		$hari_indonesia = array(
+			'Sunday' => 'Minggu',
+			'Monday' => 'Senin',
+			'Tuesday' => 'Selasa',
+			'Wednesday' => 'Rabu',
+			'Thursday' => 'Kamis',
+			'Friday' => 'Jumat',
+			'Saturday' => 'Sabtu'
+		);
+		$hari_id = $hari_indonesia[$hari];
+		
+		$status = ($keterangan == 'masuk') ? 'MASUK' : 'PULANG';
+		
+		$message = "🏫 *NOTIFIKASI ABSENSI SEKOLAH*\n\n";
+		$message .= "Kepada Yth. Orang Tua/Wali,\n\n";
+		$message .= "Kami informasikan bahwa putra/putri Anda:\n";
+		$message .= "👤 *Nama*: {$nama_siswa}\n";
+		$message .= "📅 *Hari/Tanggal*: {$hari_id}, {$waktu_formatted}\n";
+		$message .= "⏰ *Status*: {$status}\n\n";
+		
+		if ($is_manual) {
+			$message .= "⚠️ *PERHATIAN KHUSUS*\n";
+			$message .= "Absensi dilakukan secara *MANUAL* (tanpa kartu RFID)\n\n";
+			$message .= "Mohon untuk:\n";
+			$message .= "• Mengingatkan anak membawa kartu RFID\n";
+			$message .= "• Memastikan kartu dalam kondisi baik\n";
+			$message .= "• Mengajarkan kedisiplinan dalam menggunakan fasilitas sekolah\n\n";
+			$message .= "Kedisiplinan adalah kunci kesuksesan! 💪\n\n";
+		} else {
+			$message .= "✅ Absensi berhasil menggunakan kartu RFID\n\n";
+		}
+		
+		$message .= "Terima kasih atas perhatian dan kerjasamanya.\n\n";
+		$message .= "Salam hangat,\n";
+		$message .= "Tim Sekolah 🎓\n\n";
+		$message .= "_Pesan otomatis - Mohon tidak membalas_";
+		
+		return $message;
+	}
+
 	public function manualabsensijson() {
 		if (isset($_GET['key']) && isset($_GET['iddev']) && isset($_GET['id_siswa'])) {
 			$key = $this->input->get('key');
@@ -23,7 +115,6 @@ class Api extends CI_Controller {
 				$iddev = $this->input->get('iddev');
 				$id_siswa = $this->input->get('id_siswa');
 	
-				// Verify if student ID exists
 				$ceksiswa = $this->m_api->get_siswa_by_id($id_siswa);
 				if (!$ceksiswa) {
 					$notif = array('status' => 'failed', 'ket' => 'ID SISWA TIDAK DITEMUKAN');
@@ -31,7 +122,6 @@ class Api extends CI_Controller {
 					return;
 				}
 	
-				// Rest of the attendance logic
 				$device = $this->m_api->getdevice($iddev);
 				$count = count($device);
 	
@@ -107,15 +197,11 @@ class Api extends CI_Controller {
 								$today = strtotime("today");
 								$tomorrow = strtotime("tomorrow");
 	
-								// Fetch attendance data for today
 								$datamasuk = $this->m_api->get_absensi("masuk", $today, $tomorrow);
 								$datakeluar = $this->m_api->get_absensi("keluar", $today, $tomorrow);
-	
-								// Ensure $datamasuk and $datakeluar are arrays
 								$datamasuk = $datamasuk ?: [];
 								$datakeluar = $datakeluar ?: [];
 	
-								// Merge both arrays
 								$datamskKeluar = array_merge($datamasuk, $datakeluar);
 	
 								$duplicate = 0;
@@ -126,7 +212,6 @@ class Api extends CI_Controller {
 								}
 	
 								if ($duplicate == 0) {
-									// Insert attendance data
 									$data = array(
 										'id_devices' => $iddev,
 										'id_siswa' => $id_siswa,
@@ -135,7 +220,6 @@ class Api extends CI_Controller {
 									);
 	
 									if ($this->m_api->insert_absensi($data)) {
-										// Insert history data
 										$histori = array(
 											'id_siswa' => $id_siswa,
 											'keterangan' => $ket,
@@ -143,6 +227,17 @@ class Api extends CI_Controller {
 											'id_devices' => $iddev
 										);
 										$this->m_api->insert_histori($histori);
+
+										$siswa_data = $ceksiswa[0]; 
+										if (!empty($siswa_data->telp)) {
+											$message = $this->create_whatsapp_message(
+												$siswa_data->nama, 
+												$ket, 
+												time(), 
+												true 
+											);
+											$this->send_whatsapp_notification($siswa_data->telp, $message);
+										}
 	
 										$notif = array('status' => 'success', 'ket' => $respon);
 										echo json_encode($notif);
@@ -151,7 +246,7 @@ class Api extends CI_Controller {
 										echo json_encode($notif);
 									}
 								} else {
-									$notif = array('status' => 'failed', 'ket' => 'SUDAH ABSENSI.');
+									$notif = array('status' => 'failed', 'ket' => 'SUDAH ABSENSI                .');
 									echo json_encode($notif);
 								}
 							} else {
@@ -160,11 +255,11 @@ class Api extends CI_Controller {
 							}
 						}
 					} else {
-						$notif = array('status' => 'failed', 'ket' => 'HUBUNGI STAFF');
+						$notif = array('status' => 'failed', 'ket' => 'HUBUNGI STAFF                .');
 						echo json_encode($notif);
 					}
 				} else {
-					$notif = array('status' => 'failed', 'ket' => 'ID DEVICE TIDAK DITEMUKAN');
+					$notif = array('status' => 'failed', 'ket' => 'HUBUNGI STAFF                .');
 					echo json_encode($notif);
 				}
 			} else {
@@ -181,7 +276,6 @@ class Api extends CI_Controller {
 		if (isset($_GET['key']) && isset($_GET['iddev'])) {
 			$key = $this->input->get('key');
 			$cekkey = $this->m_api->getkey();
-			//print_r($cekkey);
 			if($cekkey[0]->key == $key){
 				$iddev = $this->input->get('iddev');
 
@@ -192,14 +286,14 @@ class Api extends CI_Controller {
 						$mode = $value->mode;
 					}
 					if ($mode == "-") {
-						$array = array('status' => 'warning', 'mode' => $mode, 'ket' => 'id device tidak ditemukan');
+						$array = array('status' => 'warning', 'mode' => $mode, 'ket' => 'HUBUNGI STAFF                .');
 						echo json_encode($array);
 					}else{
 						$array = array('status' => 'success', 'mode' => $mode, 'ket' => 'berhasil');
 						echo json_encode($array);
 					}
 				}else{
-					$array = array('status' => 'warning', 'mode' => $mode, 'ket' => 'id device tidak ditemukan');
+					$array = array('status' => 'warning', 'mode' => $mode, 'ket' => 'HUBUNGI STAFF                .');
 					echo json_encode($array);
 				}
 			}else{
@@ -212,68 +306,6 @@ class Api extends CI_Controller {
 		}
 	}
 
-
-	public function addcardjson(){
-		if (isset($_GET['key']) && isset($_GET['iddev']) && isset($_GET['siswa'])) {
-			$key = $this->input->get('key');
-			$cekkey = $this->m_api->getkey();
-
-			if($cekkey[0]->key == $key){
-				$iddev = $this->input->get('iddev');
-				$siswa = $this->input->get('siswa');
-
-				$checkDoublesiswa = $this->m_api->checksiswa($siswa);
-				$z = 0;
-				if (isset($checkDoublesiswa)) {
-					foreach ($checkDoublesiswa as $key => $value) {
-						$z++;
-					}
-				}
-
-				if ($z > 0) {
-					$notif = array('status' => 'failed', 'ket' => 'siswa TERDAFTAR                           .');
-					echo json_encode($notif);
-				}else{
-					$device = $this->m_api->getdevice($iddev);
-					$count = 0;
-					foreach ($device as $key => $value) {
-						$count++;
-					}
-					if ($count > 0) {
-						$savedata = array('id_devices' => $iddev, 'uid' => $siswa);
-						if ($this->m_api->insert_siswa($savedata)) {
-							$getlastsiswa = $this->m_api->last_siswa();
-							$idsiswa = 0;
-							if (isset($getlastsiswa)) {
-								foreach ($getlastsiswa as $key => $value) {
-									$idsiswa = $value->id_siswa;
-								}
-							}
-							if ($idsiswa > 0) {
-								$histori = array('id_siswa' => $idsiswa, 'keterangan' => 'ADD siswa CARD', 'waktu' => time(), 'id_devices' => $iddev);
-								if ($this->m_api->insert_histori($histori)) {
-									$notif = array('status' => 'success', 'ket' => 'DAFTAR BERHASIL                          .');
-									echo json_encode($notif);
-								}
-							}else{
-								$notif = array('status' => 'failed', 'ket' => 'terjadi kesalahan');
-								echo json_encode($notif);
-							}
-						}
-					}else{
-						$notif = array('status' => 'failed', 'ket' => 'device tidak ditemukan');
-						echo json_encode($notif);
-					}
-				}
-			}else{
-				$notif = array('status' => 'failed', 'ket' => 'salah secret key');
-				echo json_encode($notif);
-			}
-		}else{
-			$notif = array('status' => 'failed', 'ket' => 'salah parameter');
-			echo json_encode($notif);
-		}
-	}
 
 	public function absensijson() {
 		if (isset($_GET['key']) && isset($_GET['iddev']) && isset($_GET['siswa'])) {
@@ -412,6 +444,17 @@ class Api extends CI_Controller {
 												'id_devices' => $iddev
 											);
 											$this->m_api->insert_histori($histori);
+											$siswa_data = $ceksiswa[0];
+											if (!empty($siswa_data->telp)) {
+												$message = $this->create_whatsapp_message(
+													$siswa_data->nama, 
+													$ket, 
+													time(), 
+													false 
+												);
+												$this->send_whatsapp_notification($siswa_data->telp, $message);
+											}
+
 											$notif = array('status' => 'success', 'ket' => $respon);
 											echo json_encode($notif);
 										} else {
@@ -419,7 +462,7 @@ class Api extends CI_Controller {
 											echo json_encode($notif);
 										}
 									} else {
-										$notif = array('status' => 'failed', 'ket' => 'SUDAH ABSENSI.');
+										$notif = array('status' => 'failed', 'ket' => 'SUDAH ABSENSI                .');
 										echo json_encode($notif);
 									}
 								} else {
@@ -428,11 +471,11 @@ class Api extends CI_Controller {
 								}
 							}
 						} else {
-							$notif = array('status' => 'failed', 'ket' => 'HUBUNGI STAFF.');
+							$notif = array('status' => 'failed', 'ket' => 'HUBUNGI STAFF                ..');
 							echo json_encode($notif);
 						}
 					} else {
-						$notif = array('status' => 'failed', 'ket' => 'id device tidak ditemukan');
+						$notif = array('status' => 'failed', 'ket' => 'HUBUNGI STAFF                .');
 						echo json_encode($notif);
 					}
 				} else {

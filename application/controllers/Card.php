@@ -64,24 +64,21 @@ class Card extends CI_Controller {
         $pdf->SetMargins(0, 0, 0);
         $pdf->SetAutoPageBreak(true, 0);
         $pdf->AddPage('L', array(85.6, 54));
-
-        // Template Background
         $template_path = FCPATH . get_settings('path_template_card');
         if (file_exists($template_path)) {
             $pdf->Image($template_path, 0, 0, 85.6, 54, '', '', '', false, 300, '', false, false, 0);
         }
 
-        // Barcode
+
         $barcode = $this->generator->getBarcode($student->nisn, $this->generator::TYPE_CODE_128, 3, 50);
         $pdf->Image('@'.$barcode, 2, 18, 40, 5);
 
-        // Photo
+
         $photo_path = FCPATH . 'uploads/' . $student->foto;
         if (file_exists($photo_path)) {
             $pdf->Image($photo_path, 5.75, 25, 15, 20, '', '', '', false, 300, '', false, false, 1);
         }
 
-        // Student Information
         $pdf->SetFont('helvetica', 'B', 6);
         $pdf->SetTextColor(0, 0, 0);
 

@@ -8,7 +8,6 @@ class M_api extends CI_Model {
         
         return $data;
 	}
-
 	function getkey(){
 		$query = $this->db->where('id_key',1);
         $q = $this->db->get('secret_key');
@@ -16,7 +15,6 @@ class M_api extends CI_Model {
         
         return $data;
 	}
-
 	function getdevice($iddev){
 		$query = $this->db->where('id_devices',$iddev);
         $q = $this->db->get('devices');
@@ -24,37 +22,32 @@ class M_api extends CI_Model {
         
         return $data;
 	}
-
 	function insert_siswa($data){
 		$this->db->insert('siswa', $data);
        return TRUE;
 	}
-
 	function last_siswa(){
 		$this->db->select('*');
         $this->db->from('siswa');
         $this->db->order_by('id_siswa', 'desc');
         $this->db->limit(1);
         $query = $this->db->get();
-
         if ($query->num_rows() > 0) {
             return $query->result();
         }
 	}
-
 	function insert_histori($data){
 		$this->db->insert('histori', $data);
        return TRUE;
 	}
-
 	function checksiswa($siswa){
+		$this->db->select('siswa.*, siswa.telp as telp'); // Pastikan kolom telp diambil
 		$query = $this->db->where('uid',$siswa);
         $q = $this->db->get('siswa');
         $data = $q->result();
         
         return $data;
 	}
-
 	public function get_waktu_by_day($day) {
         // Daftar hari yang valid
         $valid_days = array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
@@ -82,6 +75,7 @@ class M_api extends CI_Model {
     
     
     function get_siswa_by_id($id_siswa) {
+    	$this->db->select('siswa.*, siswa.telp as telp'); // Pastikan kolom telp dan nama diambil
         $query = $this->db->where('id_siswa', $id_siswa);
         $q = $this->db->get('siswa');
         $data = $q->result();
@@ -92,7 +86,6 @@ class M_api extends CI_Model {
 		$this->db->insert('absensi', $data);
        return TRUE;
 	}
-
 	function get_absensi($ket,$today,$tomorrow){
         $this->db->select('*');
         $this->db->from('absensi');
@@ -100,12 +93,10 @@ class M_api extends CI_Model {
         $this->db->where("created_at >=", $today);
         $this->db->where("created_at <", $tomorrow);
         $query = $this->db->get();
-
         if ($query->num_rows() > 0) {
             return $query->result();
         }
     }
-
     function lastsiswafoto($idsiswa){
         $this->db->select('*');
         $this->db->from('absensi');
@@ -113,16 +104,13 @@ class M_api extends CI_Model {
         $this->db->order_by('id_absensi', 'desc');
         $this->db->limit(1);
         $query = $this->db->get();
-
         if ($query->num_rows() > 0) {
             return $query->result();
         }
     }
-
     function update_absensi($id_absensi, $data){
         $this->db->where('id_absensi', $id_absensi);
         $this->db->update('absensi', $data);
-
         return TRUE;
     }
     function count_absensi_last_two_weeks($id_siswa) {
@@ -138,8 +126,18 @@ class M_api extends CI_Model {
         return 0;
     }
     
-
-
+    // Fungsi tambahan untuk mendapatkan data lengkap siswa berdasarkan ID
+    function get_siswa_with_phone($id_siswa) {
+        $this->db->select('id_siswa, nama, telp, kelas, uid');
+        $this->db->from('siswa');
+        $this->db->where('id_siswa', $id_siswa);
+        $query = $this->db->get();
+        
+        if ($query->num_rows() > 0) {
+            return $query->row();
+        }
+        return null;
+    }
+    
 }
-
 ?>
