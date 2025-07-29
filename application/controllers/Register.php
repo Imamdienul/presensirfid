@@ -109,7 +109,7 @@ class Register extends CI_Controller {
 
         if ($upload_error) {
             $data['kelas'] = $this->Siswa->get_kelas();
-            $data['kampus'] = $this->Siswa->get_kampus();
+     
             $data['upload_error'] = $upload_error;
             $data['is_success'] = false;
             $this->load->view('i_siswa_registration', $data);
@@ -144,7 +144,7 @@ class Register extends CI_Controller {
                 redirect('register');
             } else {
                 $data['kelas'] = $this->Siswa->get_kelas();
-                $data['kampus'] = $this->Siswa->get_kampus();
+ 
                 $data['upload_error'] = 'Gagal menyimpan data. Silakan coba lagi.';
                 $data['is_success'] = false;
                 $this->load->view('i_siswa_registration', $data);
