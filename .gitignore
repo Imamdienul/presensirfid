@@ -2,6 +2,7 @@
 /uploads/*.jpg
 /uploads/*.png
 /uploads/*.jpeg
+/uploads/kartu_pelajar/*.pdf
 /assets/images/*.jpg
 application/config/config.php
 application/config/database.php
