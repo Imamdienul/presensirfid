@@ -16,52 +16,45 @@ class Api extends CI_Controller {
 	}
 
 	private function send_whatsapp_notification($phone_number, $message) {
-    $api_url = "https://api.fonnte.com/send";
-    
-    $token = "LiEZiCxNNFnG8s4djWxj";
-    
-    $phone_number = preg_replace('/[^0-9]/', '', $phone_number);
-    if (substr($phone_number, 0, 1) == '0') {
-        $phone_number = '62' . substr($phone_number, 1);
-    }
-    
-    $data = array(
-        'target' => $phone_number,
-        'message' => $message,
-        'countryCode' => '62' 
-    );
-    
-
-    $headers = array(
-        'Authorization: ' . $token,
-        'Content-Type: application/x-www-form-urlencoded'
-    );
-    
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $api_url);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-    
- 
-    $result = curl_exec($ch);
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $error = curl_error($ch);
-    curl_close($ch);
-    
-
-    if ($error) {
-        error_log("WhatsApp notification error: " . $error);
-    }
-    
-    return $result;
-}
-
-
+		// Format nomor telepon
+		$phone_number = preg_replace('/[^0-9]/', '', $phone_number);
+		if (substr($phone_number, 0, 1) == '0') {
+			$phone_number = '62' . substr($phone_number, 1);
+		}
+		
+		$body = array(
+			"api_key" => "839d1e368496506ae5f4080b1a60cfb7dd18f00e", // Ganti dengan API key Anda
+			"receiver" => $phone_number,
+			"data" => array("message" => $message)
+		);
+		
+		$curl = curl_init();
+		curl_setopt_array($curl, [
+			CURLOPT_URL => "https://whatsapp.gisaka.media/api/send-message",
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => "",
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 30,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => "POST",
+			CURLOPT_POSTFIELDS => json_encode($body),
+			CURLOPT_HTTPHEADER => [
+				"Accept: */*",
+				"Content-Type: application/json",
+			],
+		]);
+		
+		$response = curl_exec($curl);
+		$err = curl_error($curl);
+		curl_close($curl);
+		
+		if ($err) {
+			error_log("WhatsApp notification error: " . $err);
+			return false;
+		} else {
+			return $response;
+		}
+	}
 
 	private function create_whatsapp_message($nama_siswa, $keterangan, $waktu, $is_manual = false) {
 		$waktu_formatted = date('d/m/Y H:i:s', $waktu);

@@ -33,6 +33,10 @@
                         <div class="text-center mb-3">
                             <img src="<?= base_url(); ?>./uploads/<?= $murid->foto; ?>" class="img-circle" width="auto" height="100px" alt="User Image">
                         </div>
+                        
+                        <!-- Alert untuk pesan -->
+                        <div id="phone-message" style="display: none;" class="alert"></div>
+                        
                         <div class="table-responsive">
                             <table class="table table-borderless">
                                 <tbody>
@@ -43,6 +47,23 @@
                                     <tr>
                                         <th scope="row">NIK:</th>
                                         <td><?= $murid->nik; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">NOMOR TELP ORANG TUA:</th>
+                                        <td>
+                                            <!-- Form untuk edit nomor telepon -->
+                                            <form id="phone-form" style="display: inline-block;">
+                                                <div class="input-group" style="width: 300px;">
+                                                    <input type="hidden" id="murid-id" value="<?= $murid->id_siswa ?>">
+                                                    <input type="text" id="phone-input" class="form-control" value="<?= $murid->telp; ?>" maxlength="15">
+                                                    <div class="input-group-append">
+                                                        <button type="button" id="save-phone" class="btn btn-success btn-sm">
+                                                            <i class="fa fa-save"></i> Save
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <th scope="row">Tempat, Tanggal Lahir:</th>
@@ -216,5 +237,7 @@
         }
     }
 </style>
+
+
 
 <?php $this->load->view('include/footer.php'); ?>

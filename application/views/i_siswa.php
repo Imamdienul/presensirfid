@@ -31,7 +31,6 @@
                             <div class="d-flex justify-content-between mb-3">
                                 <h4 class="header-title">Data Siswa</h4>
                                 <div>
-                                    <!-- Form to generate all cards -->
                                     <form method="post" action="<?= base_url('card/generate_cards'); ?>" style="display:inline;">
                                         <input type="hidden" name="cetak_semua" value="1">
                                         <?php if (isset($row) && isset($row->kelas)): ?>
@@ -85,7 +84,7 @@
                                                     <button type="button" class="btn btn-info btn-raised dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi</button>
                                                     <div class="dropdown-menu">
                                                         <a class="dropdown-item" href="<?= base_url(); ?>siswa/detail_murid/<?= $item->id_siswa; ?>">Detail Siswa</a>
-                                                        <a class="dropdown-item" href="<?= base_url('siswa/edit_siswa/' . $item->id_siswa) ?>">Edit Siswa</a>
+                                                        <a class="dropdown-item" href="<?= base_url('kelas/edit_siswa/' . $item->id_siswa) ?>">Edit Siswa</a>
                                                         <div class="dropdown-divider"></div>
                                                         <a class="dropdown-item" href="<?= base_url('siswa/delete_siswa/' . $item->id_siswa) ?>">Hapus Siswa</a>
                                                     </div>

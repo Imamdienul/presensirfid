@@ -36,6 +36,10 @@ $this->load->view('include/header.php');?>
                                             <label>NISN</label>
                                             <input type="text" name="nisn" class="form-control" placeholder="NISN" value="<?php if (isset($nisn)) { echo $nisn; } ?>" required>
                                         </div>
+                                        <div class="form-group">
+                                            <label>NOMOR TELP ORANG TUA</label>
+                                            <input type="text" name="telp" class="form-control" placeholder="NOMOR WA ORANG TUA" value="<?php if (isset($telp)) { echo $telp; } ?>" required>
+                                        </div>
 
                                         
 
