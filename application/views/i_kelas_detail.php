@@ -69,9 +69,7 @@
                                             <td><?= $row->nama; ?></td>
                                             <td><?= $row->kelas; ?></td>
                                             <td><?= $row->id_siswa; ?></td>
-                                            <td>
-                                                <img src="<?= base_url(); ?>uploads/<?= $row->foto; ?>" class="img-circle" width="auto" height="80px" alt="Foto Murid">
-                                            </td>
+                                            
                                             <td>
                                                 <a href="<?= base_url(); ?>kelas/detail_murid/<?= $row->id_siswa; ?>" class="btn btn-success btn-sm">
                                                     <i class="fa fa-eye"></i>
