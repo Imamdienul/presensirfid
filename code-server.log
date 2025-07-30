@@ -1,0 +1,14 @@
+nohup: ignoring input
+[2025-07-30T18:59:25.405Z] info  code-server 4.101.2 aff005e19626ac6802223713fa569e743c125725
+[2025-07-30T18:59:25.407Z] info  Using user-data-dir /root/.local/share/code-server
+[2025-07-30T18:59:25.428Z] info  Using config file /root/.config/code-server/config.yaml
+[2025-07-30T18:59:25.428Z] info  HTTP server listening on http://0.0.0.0:1212/
+[2025-07-30T18:59:25.429Z] info    - Authentication is enabled
+[2025-07-30T18:59:25.430Z] info      - Using password from /root/.config/code-server/config.yaml
+[2025-07-30T18:59:25.430Z] info    - Not serving HTTPS
+[2025-07-30T18:59:25.431Z] info  Session server listening on /root/.local/share/code-server/code-server-ipc.sock
+[01:59:33] 
+
+
+
+

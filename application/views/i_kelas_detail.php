@@ -49,7 +49,7 @@
                                     <th>Nama</th>
                                     <th>Kelas</th>
                                     <th>Kode Presensi Manual</th>
-                                    <th>Foto</th>
+                                    
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
