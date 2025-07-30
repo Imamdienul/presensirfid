@@ -16,14 +16,14 @@ class Api extends CI_Controller {
 	}
 
 	private function send_whatsapp_notification($phone_number, $message) {
-		// Format nomor telepon
+		
 		$phone_number = preg_replace('/[^0-9]/', '', $phone_number);
 		if (substr($phone_number, 0, 1) == '0') {
 			$phone_number = '62' . substr($phone_number, 1);
 		}
 		
 		$body = array(
-			"api_key" => "839d1e368496506ae5f4080b1a60cfb7dd18f00e", // Ganti dengan API key Anda
+			"api_key" => "839d1e368496506ae5f4080b1a60cfb7dd18f00e", 
 			"receiver" => $phone_number,
 			"data" => array("message" => $message)
 		);

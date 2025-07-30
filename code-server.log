@@ -12,3 +12,12 @@ nohup: ignoring input
 
 
 
+[01:59:33] Extension host agent started.
+[01:59:34] [103.149.42.251][5d7824a4][ManagementConnection] Unknown reconnection token (never seen).
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda.js
+[02:01:46] [103.149.42.251][6225cdd6][ManagementConnection] New connection established.
+[02:01:47] ComputeTargetPlatform: linux-x64
+[02:01:48] [103.149.42.251][de3bded6][ExtensionHostConnection] New connection established.
+[02:01:48] [103.149.42.251][de3bded6][ExtensionHostConnection] <91559> Launched Extension Host Process.
+[02:01:51] ComputeTargetPlatform: linux-x64
