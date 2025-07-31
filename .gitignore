@@ -9,3 +9,6 @@ application/config/database.php
 .DS_Store
 /cache
 /assets/images
+/uploads/foto/*.png
+/uplaods/foto_siswa/*/*.png
+/uploads/foto/__MACOSX/

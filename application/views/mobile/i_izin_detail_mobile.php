@@ -42,7 +42,7 @@
             <?php foreach($siswa as $murid): ?>
                 <div class="bg-white rounded-lg shadow-md p-6 mb-4">
                     <div class="flex items-center mb-4">
-                        <img src="<?=base_url();?>./uploads/<?= $murid->foto ?>" alt="Foto Murid" class="w-20 h-20 object-cover rounded-full mr-4">
+                        <img src="<?=base_url();?>./uploads/foto_siswa/<?= $murid->foto ?>" alt="Foto Murid" class="w-20 h-20 object-cover rounded-full mr-4">
                         <div>
                             <h3 class="text-xl font-bold text-gray-800"><?= $murid->nama; ?></h3>
                             <p class="text-gray-600">NISN: <?= $murid->nisn; ?></p>

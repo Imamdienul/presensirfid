@@ -21,3 +21,49 @@ File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda.
 [02:01:48] [103.149.42.251][de3bded6][ExtensionHostConnection] New connection established.
 [02:01:48] [103.149.42.251][de3bded6][ExtensionHostConnection] <91559> Launched Extension Host Process.
 [02:01:51] ComputeTargetPlatform: linux-x64
+[02:38:38] [103.149.42.251][6225cdd6][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+[02:38:38] [103.149.42.251][de3bded6][ExtensionHostConnection] <91559> Extension Host Process exited with code: 0, signal: null.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda.js
+[02:38:40] [103.149.42.251][a2028b57][ManagementConnection] New connection established.
+[02:38:42] [103.149.42.251][283273d5][ExtensionHostConnection] New connection established.
+[02:38:42] [103.149.42.251][283273d5][ExtensionHostConnection] <105860> Launched Extension Host Process.
+[05:57:47] [103.149.42.251][283273d5][ExtensionHostConnection] The client has reconnected.
+[06:12:33] [103.149.42.251][283273d5][ExtensionHostConnection] The client has reconnected.
+[06:52:44] [103.149.42.251][a2028b57][ManagementConnection] The client has disconnected, will wait for reconnection 3h before disposing...
+[07:03:25] [103.149.42.251][a2028b57][ManagementConnection] Another client has connected, will shorten the wait for reconnection 5m before disposing...
+[07:03:25] [103.149.42.251][a2028b57][ManagementConnection] The client has reconnected.
+[07:11:23] [103.149.42.251][283273d5][ExtensionHostConnection] The client has reconnected.
+[07:33:53] [103.149.42.251][283273d5][ExtensionHostConnection] The client has reconnected.
+[10:01:04] [103.149.42.251][283273d5][ExtensionHostConnection] The client has reconnected.
+[10:03:02] [103.149.42.251][a2028b57][ManagementConnection] The client has disconnected, will wait for reconnection 3h before disposing...
+[10:19:31] [103.149.42.251][a2028b57][ManagementConnection] Another client has connected, will shorten the wait for reconnection 5m before disposing...
+[10:19:31] [103.149.42.251][a2028b57][ManagementConnection] The client has reconnected.
+[12:20:08] [103.149.42.251][283273d5][ExtensionHostConnection] The client has reconnected.
+[12:56:14] [103.149.42.251][a2028b57][ManagementConnection] The client has disconnected, will wait for reconnection 3h before disposing...
+[13:07:11] [103.149.42.251][a2028b57][ManagementConnection] Another client has connected, will shorten the wait for reconnection 5m before disposing...
+[13:07:11] [103.149.42.251][a2028b57][ManagementConnection] The client has reconnected.
+[14:21:06] [103.149.42.251][a2028b57][ManagementConnection] The client has disconnected, will wait for reconnection 3h before disposing...
+[17:20:27] [103.149.42.251][283273d5][ExtensionHostConnection] <105860> Extension Host Process exited with code: 0, signal: null.
+[17:21:14] [103.149.42.251][a2028b57][ManagementConnection] The reconnection grace time of 3h has expired, so the connection will be disposed.
+[19:21:35] [103.149.42.251][283273d5][ExtensionHostConnection] Unknown reconnection token (seen before).
+[19:21:36] [103.149.42.251][a2028b57][ManagementConnection] Unknown reconnection token (seen before).
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda.js
+[19:21:40] [103.149.42.251][f9be0170][ManagementConnection] New connection established.
+[19:21:42] [103.149.42.251][1ba2b5b0][ExtensionHostConnection] New connection established.
+[19:21:42] [103.149.42.251][1ba2b5b0][ExtensionHostConnection] <404940> Launched Extension Host Process.
+[19:21:55] [103.149.42.251][f9be0170][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+[19:21:55] [103.149.42.251][1ba2b5b0][ExtensionHostConnection] <404940> Extension Host Process exited with code: 0, signal: null.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+[19:21:56] [103.149.42.251][1dfb85ee][ManagementConnection] New connection established.
+[19:21:59] [103.149.42.251][c60b54c9][ExtensionHostConnection] New connection established.
+[19:21:59] [103.149.42.251][c60b54c9][ExtensionHostConnection] <408429> Launched Extension Host Process.
+[19:49:51] [103.149.42.251][1dfb85ee][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+[19:49:52] [103.149.42.251][c60b54c9][ExtensionHostConnection] <408429> Extension Host Process exited with code: 0, signal: null.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda.js
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+[19:49:53] [103.149.42.251][3bd28fa5][ManagementConnection] New connection established.
+[19:49:55] [103.149.42.251][b91ab32c][ExtensionHostConnection] New connection established.
+[19:49:55] [103.149.42.251][b91ab32c][ExtensionHostConnection] <418920> Launched Extension Host Process.
+[20:18:05] [103.149.42.251][b91ab32c][ExtensionHostConnection] The client has reconnected.

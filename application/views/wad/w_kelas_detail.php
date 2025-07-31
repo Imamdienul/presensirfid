@@ -57,7 +57,7 @@
                                                     <td><?= $row->kelas; ?></td>
                                                     <td style="min-width:250px;"><?= $row->alamat; ?></td>
                                                     <td>
-                                                        <img src="<?= base_url(); ?>./uploads/<?= $row->foto; ?>" class="img-circle" width="auto" height="100px" alt="User Image">
+                                                        <img src="<?= base_url(); ?>./uploads/foto_siswa/<?= $row->foto; ?>" class="img-circle" width="auto" height="100px" alt="User Image">
                                                     </td>
                                                     <td style="min-width:100px;">
                                                         <a href="<?= base_url() ?>/wad/detail_murid/<?= $row->id_siswa; ?>" class="btn btn-success btn-sm">

@@ -25,7 +25,7 @@
             <!-- Photos column -->
             <div class="col-md-3 col-xl-3">
                 <h5>Foto Murid</h5>
-                <img src="<?=base_url();?>./uploads/<?php echo $murid->foto;?>" class="img-circle" width="auto" height="200px" alt="User Image">
+                <img src="<?=base_url();?>./uploads/foto_siswa/<?php echo $murid->foto;?>" class="img-circle" width="auto" height="200px" alt="User Image">
             </div>
          
 

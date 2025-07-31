@@ -42,7 +42,7 @@
                                 <?php endif; ?>
                                 
                                 <div class="box">
-                                    <img src="<?=base_url();?>./uploads/<?= $murid->foto ?>" 
+                                    <img src="<?=base_url();?>./uploads/foto_siswa/<?= $murid->foto ?>" 
                                          style="width:100px; height:100px; object-fit:cover; border-radius:5px; margin-bottom:15px;" 
                                          alt="Foto Murid">
                                 </div>

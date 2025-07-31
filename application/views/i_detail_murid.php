@@ -31,7 +31,7 @@
                             </a>
                         </h1>
                         <div class="text-center mb-3">
-                            <img src="<?= base_url(); ?>./uploads/<?= $murid->foto; ?>" class="img-circle" width="auto" height="100px" alt="User Image">
+                            <img src="<?= base_url(); ?>./uploads/foto_siswa/<?= $murid->foto; ?>" class="img-circle" width="auto" height="100px" alt="User Image">
                         </div>
                         
                         <!-- Alert untuk pesan -->
@@ -99,7 +99,7 @@
                 </div>
                 
                 <!-- Foto Murid -->
-                <div class="photo" style="background-image: url('<?= base_url('uploads/'.$murid->foto); ?>');"></div>
+                <div class="photo" style="background-image: url('<?= base_url('uploads/foto_siswa/'.$murid->foto); ?>');"></div>
                 
                 <!-- Detail Murid -->
                 <div class="details">
@@ -225,7 +225,7 @@
         }
 
         .photo {
-            background-image: url('<?= base_url('uploads/'.$murid->foto); ?>') !important;
+            background-image: url('<?= base_url('uploads/foto_siswa/'.$murid->foto); ?>') !important;
             background-size: cover;
             background-position: center;
             -webkit-print-color-adjust: exact;

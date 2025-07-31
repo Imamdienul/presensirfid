@@ -13,6 +13,14 @@ class Siswa extends CI_Model {
         return $query->result();
     }
     
+    // Method baru untuk mengambil informasi kelas berdasarkan ID
+    public function get_kelas_by_id($id) {
+        $this->db->select('id, kelas');
+        $this->db->from('kelas');
+        $this->db->where('id', $id);
+        $query = $this->db->get();
+        return $query->row();
+    }
     
     public function insert_siswa($data) {
         // Validasi data sebelum insert

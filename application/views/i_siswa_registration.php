@@ -9,9 +9,9 @@
     <meta content="Admin Dashboard" name="description" />
     <meta content="Mannatthemes" name="author" />
     <link rel="shortcut icon" href="<?= base_url(); ?>assets/images/gi.png">
-    <!-- Preload critical CSS inline untuk mempercepat loading -->
+    
     <style>
-        .bg-custom-purple {
+                .bg-custom-purple {
             background-color: #252f75;
         }
         .text-custom-purple {
@@ -177,6 +177,94 @@
                 margin-bottom: 0.25rem;
             }
         }
+        /* Style untuk galeri foto */
+        .photo-gallery {
+            display: none;
+            margin-top: 10px;
+        }
+        
+        .photo-gallery.show {
+            display: block;
+        }
+        
+        .gallery-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+        
+        .photo-item {
+            position: relative;
+            cursor: pointer;
+            border: 3px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .photo-item:hover {
+            border-color: #007bff;
+            transform: scale(1.05);
+        }
+        
+        .photo-item.selected {
+            border-color: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+        }
+        
+        .photo-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .photo-item .checkmark {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #28a745;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .photo-item.selected .checkmark {
+            display: flex;
+        }
+        
+        .loading-message {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .no-photos-message {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-style: italic;
+        }
+        
+        .gallery-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
     </style>
 </head>
 
@@ -203,8 +291,18 @@
                             <?= $upload_error ?>
                         </div>
                     <?php endif; ?>
-                    <?php echo validation_errors(); ?>
-                    <?php echo form_open_multipart('register/submit', ['class' => 'registration-form']); ?>
+                    
+                    <?php if (isset($validation_errors) && !empty($validation_errors)): ?>
+                        <div class="alert alert-error">
+                            <ul>
+                                <?php foreach ($validation_errors as $error): ?>
+                                    <li><?= $error ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php echo form_open('register/submit', ['class' => 'registration-form']); ?>
                         
                         <div class="form-group">
                             <label for="nama" class="form-label">Nama:</label>
@@ -251,9 +349,19 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="foto" class="form-label">Foto:</label>
-                            <input class="form-input" type="file" name="foto" id="foto" required accept="image/*">
-                            <div class="file-input-help">Upload foto Anda di sini (JPG, PNG, GIF)</div>
+                            <label class="form-label">Foto:</label>
+                            <div class="file-input-help">Pilih kelas terlebih dahulu untuk melihat galeri foto</div>
+                            
+                            <!-- Hidden input untuk menyimpan foto yang dipilih -->
+                            <input type="hidden" name="selected_photo" id="selected_photo" required>
+                            
+                            <!-- Galeri foto -->
+                            <div class="photo-gallery" id="photo-gallery">
+                                <div class="gallery-title" id="gallery-title"></div>
+                                <div class="gallery-container" id="gallery-container">
+                                    <div class="loading-message" id="loading-message">Memuat foto...</div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -271,7 +379,6 @@
         </div>
     </div>
 
-    <!-- Load FontAwesome asynchronously untuk mempercepat loading -->
     <script>
         // Load FontAwesome secara async
         const fontAwesome = document.createElement('link');
@@ -291,12 +398,95 @@
             e.target.value = value;
         });
 
+        // Event listener untuk pemilihan kelas
+        document.getElementById('kelas').addEventListener('change', function() {
+            const selectedKelas = this.value;
+            const photoGallery = document.getElementById('photo-gallery');
+            const galleryContainer = document.getElementById('gallery-container');
+            const loadingMessage = document.getElementById('loading-message');
+            const galleryTitle = document.getElementById('gallery-title');
+            const selectedPhotoInput = document.getElementById('selected_photo');
+            
+            // Reset pilihan foto sebelumnya
+            selectedPhotoInput.value = '';
+            
+            if (selectedKelas) {
+                // Tampilkan galeri dan loading
+                photoGallery.classList.add('show');
+                galleryContainer.innerHTML = '<div class="loading-message">Memuat foto...</div>';
+                
+                // AJAX request untuk mengambil foto berdasarkan kelas
+                fetch('<?= base_url('register/get_photos_by_class') ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'id_kelas=' + encodeURIComponent(selectedKelas)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        galleryTitle.textContent = 'Pilih Foto dari Kelas ' + data.kelas + ':';
+                        
+                        if (data.photos && data.photos.length > 0) {
+                            let photosHtml = '<div class="photo-grid">';
+                            data.photos.forEach(function(photo) {
+                                photosHtml += `
+                                    <div class="photo-item" data-filename="${photo.filename}">
+                                        <img src="${photo.path}" alt="Foto" loading="lazy">
+                                        <div class="checkmark">✓</div>
+                                    </div>
+                                `;
+                            });
+                            photosHtml += '</div>';
+                            galleryContainer.innerHTML = photosHtml;
+                            
+                            // Event listener untuk pemilihan foto
+                            document.querySelectorAll('.photo-item').forEach(function(item) {
+                                item.addEventListener('click', function() {
+                                    // Remove selected class from all items
+                                    document.querySelectorAll('.photo-item').forEach(function(otherItem) {
+                                        otherItem.classList.remove('selected');
+                                    });
+                                    
+                                    // Add selected class to clicked item
+                                    this.classList.add('selected');
+                                    
+                                    // Set hidden input value
+                                    selectedPhotoInput.value = this.dataset.filename;
+                                });
+                            });
+                        } else {
+                            galleryContainer.innerHTML = '<div class="no-photos-message">Tidak ada foto tersedia untuk kelas ini</div>';
+                        }
+                    } else {
+                        galleryContainer.innerHTML = '<div class="no-photos-message">Error: ' + data.message + '</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    galleryContainer.innerHTML = '<div class="no-photos-message">Terjadi kesalahan saat memuat foto</div>';
+                });
+            } else {
+                // Sembunyikan galeri jika tidak ada kelas yang dipilih
+                photoGallery.classList.remove('show');
+            }
+        });
+
         // Validasi form sebelum submit
         document.querySelector('.registration-form').addEventListener('submit', function(e) {
             const telp = document.getElementById('telp').value;
+            const selectedPhoto = document.getElementById('selected_photo').value;
+            
             if (telp.length < 8 || telp.length > 13) {
                 e.preventDefault();
                 alert('Nomor HP harus antara 8-13 digit');
+                return false;
+            }
+            
+            if (!selectedPhoto) {
+                e.preventDefault();
+                alert('Silakan pilih foto terlebih dahulu');
                 return false;
             }
         });

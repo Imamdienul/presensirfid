@@ -25,7 +25,7 @@
                         <div class="card m-b-30">
                             <div class="card-body">
                                 <div class="d-flex align-items-center">
-                                    <img src="<?= base_url(); ?>./uploads/<?= $murid->foto ?>" class="foto-siswa" alt="Foto Murid">
+                                    <img src="<?= base_url(); ?>./uploads/foto_siswa/<?= $murid->foto ?>" class="foto-siswa" alt="Foto Murid">
                                     <div class="ml-3">
                                         <h1 class="mt-0 header-title"><?= $murid->nama; ?></h1>
                                         <hr>

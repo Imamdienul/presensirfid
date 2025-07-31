@@ -33,7 +33,7 @@
                         <div class="card m-b-30">
                             <div class="card-body text-center">
                                 <div class="box">
-                                    <img src="<?=base_url();?>./uploads/<?= $murid->foto ?>" style="width:100px; height:100px; object-fit:cover; border-radius:5px; margin-bottom:15px;" alt="Foto Murid">
+                                    <img src="<?=base_url();?>./uploads/foto_siswa/<?= $murid->foto ?>" style="width:100px; height:100px; object-fit:cover; border-radius:5px; margin-bottom:15px;" alt="Foto Murid">
                                 </div>
                                 <h1 class="header-title"><?= $murid->nama; ?></h1>
                                 <hr>

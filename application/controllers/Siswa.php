@@ -106,7 +106,7 @@ class Siswa extends CI_Controller {
         }
         $siswa = $this->model_siswa->get_siswa_byid($id);
         if (!empty($siswa) && !empty($siswa[0]->foto) && $siswa[0]->foto != 'default.jpg') {
-            $photo_path = './uploads/' . $siswa[0]->foto;
+            $photo_path = './uploads/foto_siswa/' . $siswa[0]->foto;
             if (file_exists($photo_path)) {
                 @unlink($photo_path);
             }
@@ -122,7 +122,7 @@ class Siswa extends CI_Controller {
     }
     private function _upload_photo() {
         $config = [
-            'upload_path' => './uploads/',
+            'upload_path' => './uploads/foto_siswa/',
             'allowed_types' => 'gif|jpg|jpeg|png',
             
             'file_name' => strtolower(str_replace(' ', '_', $this->input->post('nama'))) . '_' . time()
@@ -138,8 +138,8 @@ class Siswa extends CI_Controller {
             $upload_data = $this->upload->data();
             
             $old_foto = $this->input->post('old_foto');
-            if ($old_foto && file_exists('./uploads/' . $old_foto) && $old_foto != 'default.jpg') {
-                @unlink('./uploads/' . $old_foto);
+            if ($old_foto && file_exists('./uploads/foto_siswa/' . $old_foto) && $old_foto != 'default.jpg') {
+                @unlink('./uploads/foto_siswa/' . $old_foto);
             }
             
             return $upload_data['file_name'];

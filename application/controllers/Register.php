@@ -13,12 +13,56 @@ class Register extends CI_Controller {
     
     public function index() {
         $data['kelas'] = $this->Siswa->get_kelas();
-       
         
         // Set default value for is_success
         $data['is_success'] = $this->session->flashdata('registered') ?? false;
         
         $this->load->view('i_siswa_registration', $data);
+    }
+    
+    // Method baru untuk mengambil foto berdasarkan kelas
+    public function get_photos_by_class() {
+        $id_kelas = $this->input->post('id_kelas');
+        
+        if (!$id_kelas) {
+            echo json_encode(['status' => 'error', 'message' => 'Kelas tidak dipilih']);
+            return;
+        }
+        
+        // Ambil nama kelas
+        $kelas_info = $this->Siswa->get_kelas_by_id($id_kelas);
+        if (!$kelas_info) {
+            echo json_encode(['status' => 'error', 'message' => 'Kelas tidak ditemukan']);
+            return;
+        }
+        
+        $nama_kelas = $kelas_info->kelas;
+        $foto_dir = './uploads/foto/' . $nama_kelas . '/';
+        
+        $photos = array();
+        
+        if (is_dir($foto_dir)) {
+            $allowed_ext = array('jpg', 'jpeg', 'png', 'gif');
+            $files = scandir($foto_dir);
+            
+            foreach ($files as $file) {
+                if ($file != '.' && $file != '..') {
+                    $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                    if (in_array($ext, $allowed_ext)) {
+                        $photos[] = array(
+                            'filename' => $file,
+                            'path' => base_url('uploads/foto/' . $nama_kelas . '/' . $file)
+                        );
+                    }
+                }
+            }
+        }
+        
+        echo json_encode(array(
+            'status' => 'success',
+            'photos' => $photos,
+            'kelas' => $nama_kelas
+        ));
     }
     
     public function submit() {
@@ -32,6 +76,7 @@ class Register extends CI_Controller {
         $nisn = $this->input->post('nisn');
         $telp = $this->input->post('telp');
         $alamat = trim($this->input->post('alamat'));
+        $selected_photo = $this->input->post('selected_photo'); // Foto yang dipilih dari galeri
         
         // Validasi manual
         if (empty($nama)) {
@@ -55,6 +100,9 @@ class Register extends CI_Controller {
         if (empty($alamat)) {
             $errors[] = 'Alamat wajib diisi';
         }
+        if (empty($selected_photo)) {
+            $errors[] = 'Foto wajib dipilih';
+        }
         
         // Cek duplikasi NISN
         if (!empty($nisn)) {
@@ -66,50 +114,47 @@ class Register extends CI_Controller {
 
         if (!empty($errors)) {
             $data['kelas'] = $this->Siswa->get_kelas();
-           
             $data['validation_errors'] = $errors;
             $data['is_success'] = false;
             $this->load->view('i_siswa_registration', $data);
             return;
         }
 
-        $captured_photo = $this->input->post('captured_photo');
-        $upload_error = '';
+        // Proses foto yang dipilih
         $file_name = null;
-
-        if ($captured_photo) {
-            // Handle photo captured from the camera
-            $file_name = strtolower(str_replace(' ', '_', $nama)) . '_' . time() . '.png';
-            $file_path = './uploads/' . $file_name;
-            $captured_photo = str_replace('data:image/png;base64,', '', $captured_photo);
-            $captured_photo = str_replace(' ', '+', $captured_photo);
-            $image_data = base64_decode($captured_photo);
+        $upload_error = '';
+        
+        if ($selected_photo) {
+            // Ambil informasi kelas
+            $kelas_info = $this->Siswa->get_kelas_by_id($id_kelas);
+            $nama_kelas = $kelas_info->kelas;
             
-            if (!file_put_contents($file_path, $image_data)) {
-                $upload_error = 'Gagal menyimpan foto dari kamera';
-            }
-        } else {
-            // Handle uploaded file
-            $config['upload_path'] = './uploads/';
-            $config['allowed_types'] = 'gif|jpg|png|jpeg';
-            $config['max_size'] = 2048; // 2MB limit
-            $config['max_width'] = 2000;
-            $config['max_height'] = 2000;
-            $config['file_name'] = strtolower(str_replace(' ', '_', $nama)) . '_' . time(); 
-
-            $this->upload->initialize($config);
-
-            if (!$this->upload->do_upload('foto')) {
-                $upload_error = $this->upload->display_errors();
+            // Path foto sumber
+            $source_path = './uploads/foto/' . $nama_kelas . '/' . $selected_photo;
+            
+            if (file_exists($source_path)) {
+                // Buat direktori foto_siswa jika belum ada
+                $target_dir = './uploads/foto_siswa/';
+                if (!is_dir($target_dir)) {
+                    mkdir($target_dir, 0755, true);
+                }
+                
+                // Generate nama file baru
+                $file_extension = pathinfo($selected_photo, PATHINFO_EXTENSION);
+                $file_name = strtolower(str_replace(' ', '_', $nama)) . '_' . time() . '.' . $file_extension;
+                $target_path = $target_dir . $file_name;
+                
+                // Copy file ke direktori foto_siswa
+                if (!copy($source_path, $target_path)) {
+                    $upload_error = 'Gagal menyalin foto';
+                }
             } else {
-                $upload_data = $this->upload->data();
-                $file_name = $upload_data['file_name'];
+                $upload_error = 'File foto tidak ditemukan';
             }
         }
 
         if ($upload_error) {
             $data['kelas'] = $this->Siswa->get_kelas();
-     
             $data['upload_error'] = $upload_error;
             $data['is_success'] = false;
             $this->load->view('i_siswa_registration', $data);
@@ -134,8 +179,7 @@ class Register extends CI_Controller {
                 'nisn' => $nisn,
                 'telp' => $telp,
                 'alamat' => $alamat,
-                'foto' => $file_name,
-               
+                'foto' => $file_name, // Hanya nama file yang disimpan
             );
 
             if ($this->Siswa->insert_siswa($data)) {
@@ -144,7 +188,6 @@ class Register extends CI_Controller {
                 redirect('register');
             } else {
                 $data['kelas'] = $this->Siswa->get_kelas();
- 
                 $data['upload_error'] = 'Gagal menyimpan data. Silakan coba lagi.';
                 $data['is_success'] = false;
                 $this->load->view('i_siswa_registration', $data);

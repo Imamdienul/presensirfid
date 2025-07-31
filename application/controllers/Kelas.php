@@ -301,11 +301,11 @@ public function save_edit_siswa() {
 
             $foto = $foto_lama;
             if (!empty($_FILES['foto']['name'])) {
-                if (!is_dir('./uploads/')) {
-                    mkdir('./uploads/', 0777, true);
+                if (!is_dir('./uploads/foto_siswa/')) {
+                    mkdir('./uploads/foto_siswa/', 0777, true);
                 }
                 
-                $config['upload_path'] = './uploads/';
+                $config['upload_path'] = './uploads/foto/siswa/';
                 $config['allowed_types'] = '*';
                 $config['file_name'] = strtolower(str_replace(' ', '_', $this->input->post('nama'))) . '_' . time();
                 
@@ -316,20 +316,20 @@ public function save_edit_siswa() {
                     $upload_data = $this->upload->data();
                     $foto = $upload_data['file_name'];
    
-                    if ($foto_lama && file_exists('./uploads/' . $foto_lama) && $foto_lama != 'default.jpg') {
-                        @unlink('./uploads/' . $foto_lama);
+                    if ($foto_lama && file_exists('./uploads/foto_siswa/' . $foto_lama) && $foto_lama != 'default.jpg') {
+                        @unlink('./uploads/foto_siswa/' . $foto_lama);
                     }
                 } else {
                     $error = $this->upload->display_errors();
                     if (strpos($error, 'upload_path_does_not_exist') !== false) {
-                        mkdir('./uploads/', 0777, true);
+                        mkdir('./uploads/foto_siswa/', 0777, true);
                         if ($this->upload->do_upload('foto')) {
                             $upload_data = $this->upload->data();
                             $foto = $upload_data['file_name'];
                             
      
-                            if ($foto_lama && file_exists('./uploads/' . $foto_lama) && $foto_lama != 'default.jpg') {
-                                @unlink('./uploads/' . $foto_lama);
+                            if ($foto_lama && file_exists('./uploads/foto_siswa/' . $foto_lama) && $foto_lama != 'default.jpg') {
+                                @unlink('./uploads/foto_siswa/' . $foto_lama);
                             }
                         } else {
                             $this->session->set_flashdata('pesan', '<div class="alert alert-warning" id="alert"><i class="glyphicon glyphicon-warning-sign"></i> Foto gagal diupload. Data lain tetap diupdate.</div>');
