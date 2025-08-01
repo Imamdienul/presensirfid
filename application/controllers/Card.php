@@ -74,7 +74,7 @@ class Card extends CI_Controller {
         $pdf->Image('@'.$barcode, 2, 18, 40, 5);
 
 
-        $photo_path = FCPATH . 'uploads/' . $student->foto;
+        $photo_path = FCPATH . 'uploads/foto_siswa/' . $student->foto;
         if (file_exists($photo_path)) {
             $pdf->Image($photo_path, 5.75, 25, 15, 20, '', '', '', false, 300, '', false, false, 1);
         }
