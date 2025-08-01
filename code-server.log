@@ -205,3 +205,39 @@ File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_
 [13:15:44] [103.149.42.251][ff0a54f7][ManagementConnection] New connection established.
 [13:15:46] [103.149.42.251][9d6815a0][ExtensionHostConnection] New connection established.
 [13:15:46] [103.149.42.251][9d6815a0][ExtensionHostConnection] <852805> Launched Extension Host Process.
+[13:43:32] [103.149.42.251][ff0a54f7][ManagementConnection] The client has reconnected.
+[13:43:32] [103.149.42.251][9d6815a0][ExtensionHostConnection] The client has reconnected.
+[14:00:47] [103.149.42.251][37fd3621][ManagementConnection] The client has disconnected, will wait for reconnection 3h before disposing...
+[14:00:50] [103.149.42.251][ff0a54f7][ManagementConnection] The client has disconnected, will wait for reconnection 3h before disposing...
+[14:23:43] [103.149.42.251][37fd3621][ManagementConnection] Another client has connected, will shorten the wait for reconnection 5m before disposing...
+[14:23:43] [103.149.42.251][ff0a54f7][ManagementConnection] Another client has connected, will shorten the wait for reconnection 5m before disposing...
+[14:23:43] [103.149.42.251][ff0a54f7][ManagementConnection] The client has reconnected.
+[14:24:09] [103.149.42.251][9d6815a0][ExtensionHostConnection] The client has reconnected.
+[14:27:43] [103.149.42.251][ff0a54f7][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+[14:27:43] [103.149.42.251][9d6815a0][ExtensionHostConnection] <852805> Extension Host Process exited with code: 0, signal: null.
+[14:28:43] [103.149.42.251][37fd3621][ManagementConnection] The reconnection short grace time of 5m has expired, so the connection will be disposed.
+[14:28:43] [103.149.42.251][2106a40a][ExtensionHostConnection] <762715> Extension Host Process exited with code: 0, signal: null.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda.js
+[14:37:02] [103.149.42.251][9106da69][ManagementConnection] New connection established.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vscode-regexp-languagedetection/dist/index.js
+[14:37:09] [103.149.42.251][5ecbefa7][ExtensionHostConnection] New connection established.
+[14:37:09] [103.149.42.251][5ecbefa7][ExtensionHostConnection] <890176> Launched Extension Host Process.
+[14:37:14] [103.149.42.251][9106da69][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+[14:37:15] [103.149.42.251][5ecbefa7][ExtensionHostConnection] <890176> Extension Host Process exited with code: 0, signal: null.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+[14:37:21] [103.149.42.251][c4b6f3ce][ManagementConnection] New connection established.
+[14:37:27] [103.149.42.251][e2c6ce43][ExtensionHostConnection] New connection established.
+[14:37:27] [103.149.42.251][e2c6ce43][ExtensionHostConnection] <892586> Launched Extension Host Process.
+[15:00:25] [103.149.42.251][7f1f7f25][ExtensionHostConnection] Unknown reconnection token (seen before).
+[15:00:29] [103.149.42.251][0384a092][ManagementConnection] Unknown reconnection token (seen before).
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda.js
+[15:00:39] [103.149.42.251][9e849816][ManagementConnection] New connection established.
+[15:00:43] [103.149.42.251][c4b6f3ce][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+[15:00:43] [103.149.42.251][e2c6ce43][ExtensionHostConnection] <892586> Extension Host Process exited with code: 0, signal: null.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+[15:00:47] [103.149.42.251][ae8abbc9][ManagementConnection] New connection established.
+[15:00:55] [103.149.42.251][091dbf0b][ExtensionHostConnection] New connection established.
+[15:00:55] [103.149.42.251][091dbf0b][ExtensionHostConnection] <906246> Launched Extension Host Process.
+[15:01:15] [103.149.42.251][9e849816][ManagementConnection] The client has disconnected, will wait for reconnection 3h before disposing...
