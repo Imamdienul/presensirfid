@@ -33,6 +33,17 @@
                             <div>
                                 <?php if(isset($kelas->id)): ?>
                                     <a href="<?= base_url(); ?>kelas/rekap_absen/<?= $kelas->id; ?>" class="btn btn-primary">Rekap Absen</a>
+                                    
+                                    <!-- Tombol Upload Foto Kelas -->
+                                    <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#uploadFotoModal">
+                                        <i class="fa fa-upload"></i> Upload Foto Kelas
+                                    </button>
+                                    
+                                    <!-- Tombol Lihat Foto Kelas -->
+                                    <a href="<?= base_url(); ?>kelas/lihat_foto_kelas/<?= $kelas->id; ?>" class="btn btn-info">
+                                        <i class="fa fa-images"></i> Lihat Foto Kelas
+                                    </a>
+                                    
                                     <form method="post" action="<?= base_url('card/generate_cards'); ?>" style="display:inline;">
                                         <input type="hidden" name="cetak_semua" value="1">
                                         <input type="hidden" name="kelas_id" value="<?= $kelas->id ?>">
@@ -49,7 +60,6 @@
                                     <th>Nama</th>
                                     <th>Kelas</th>
                                     <th>Kode Presensi Manual</th>
-                                    
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -92,5 +102,48 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Upload Foto Kelas -->
+<div class="modal fade" id="uploadFotoModal" tabindex="-1" role="dialog" aria-labelledby="uploadFotoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadFotoModalLabel">Upload Foto ke Kelas: <?= isset($kelas->kelas) ? $kelas->kelas : '-'; ?></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadFotoForm" enctype="multipart/form-data">
+                    <input type="hidden" name="id_kelas" value="<?= isset($kelas->id) ? $kelas->id : ''; ?>">
+                    
+                    <div class="form-group">
+                        <label for="foto_files">Pilih Foto-foto (Bisa pilih banyak file sekaligus):</label>
+                        <input type="file" class="form-control-file" id="foto_files" name="foto_files[]" multiple accept="image/*" required>
+                        <small class="form-text text-muted">
+                            Format yang diizinkan: JPG, JPEG, PNG, GIF, BMP. Maksimal 5MB per file.
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div id="file_preview" class="row"></div>
+                    </div>
+                    
+                    <div class="progress" id="upload_progress" style="display: none;">
+                        <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    
+                    <div id="upload_result" class="mt-3"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-primary" id="btnUpload">Upload Foto</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <?php $this->load->view('include/footer.php'); ?>
