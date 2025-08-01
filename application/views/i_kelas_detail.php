@@ -12,7 +12,7 @@
                             <li class="breadcrumb-item active"><?= isset($kelas->kelas) ? $kelas->kelas : 'Detail Kelas'; ?></li>
                         </ol>
                     </div>
-                    <h4 class="page-title">Detail Kelas</h4>
+                    <h4 class="page-title">Detail</h4>
                 </div>
             </div>
             <div class="clearfix"></div>
