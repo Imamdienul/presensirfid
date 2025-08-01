@@ -110,7 +110,7 @@
             }
 
             .photo {
-                background-image: url('<?= base_url("uploads/".$card["student"]->foto); ?>') !important;
+                background-image: url('<?= base_url("uploads/foto_siswa/".$card["student"]->foto); ?>') !important;
                 background-size: cover;
                 background-position: center;
                 -webkit-print-color-adjust: exact;
@@ -132,7 +132,7 @@
                 <div class="barcode">
                     <img src="data:image/png;base64,<?= $card['barcode']; ?>" alt="Barcode">
                 </div>
-                <div class="photo" style="background-image: url('<?= base_url('uploads/'.$card['student']->foto); ?>');"></div>
+                <div class="photo" style="background-image: url('<?= base_url('uploads/foto_siswa/'.$card['student']->foto); ?>');"></div>
                 <div class="details">
                     <table>
                         <tr>
