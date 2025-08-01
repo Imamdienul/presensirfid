@@ -67,3 +67,90 @@ File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_
 [19:49:55] [103.149.42.251][b91ab32c][ExtensionHostConnection] New connection established.
 [19:49:55] [103.149.42.251][b91ab32c][ExtensionHostConnection] <418920> Launched Extension Host Process.
 [20:18:05] [103.149.42.251][b91ab32c][ExtensionHostConnection] The client has reconnected.
+[21:03:30] [103.149.42.251][3bd28fa5][ManagementConnection] The client has disconnected, will wait for reconnection 3h before disposing...
+[00:03:37] [103.149.42.251][3bd28fa5][ManagementConnection] The reconnection grace time of 3h has expired, so the connection will be disposed.
+[00:09:33] [103.149.42.251][b91ab32c][ExtensionHostConnection] <418920> Extension Host Process exited with code: 0, signal: null.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda.js
+[08:35:33] [103.149.42.251][1de50174][ManagementConnection] New connection established.
+[08:35:39] [103.149.42.251][24712c61][ExtensionHostConnection] New connection established.
+[08:35:39] [103.149.42.251][24712c61][ExtensionHostConnection] <704352> Launched Extension Host Process.
+[08:37:19] [103.149.42.251][1de50174][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+[08:37:19] [103.149.42.251][24712c61][ExtensionHostConnection] <704352> Extension Host Process exited with code: 0, signal: null.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+[08:37:21] [103.149.42.251][eac4093e][ManagementConnection] New connection established.
+[08:37:23] [103.149.42.251][1e551c20][ExtensionHostConnection] New connection established.
+[08:37:23] [103.149.42.251][1e551c20][ExtensionHostConnection] <706634> Launched Extension Host Process.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda.js
+[08:46:59] [103.149.42.251][3a02a3aa][ManagementConnection] New connection established.
+[08:47:03] RequestStore#acceptReply was called without receiving a matching request 92
+[08:47:03] RequestStore#acceptReply was called without receiving a matching request 93
+[08:47:03] RequestStore#acceptReply was called without receiving a matching request 94
+[08:47:03] RequestStore#acceptReply was called without receiving a matching request 95
+[08:47:03] RequestStore#acceptReply was called without receiving a matching request 96
+[08:47:03] RequestStore#acceptReply was called without receiving a matching request 97
+[08:47:03] RequestStore#acceptReply was called without receiving a matching request 98
+[08:47:03] RequestStore#acceptReply was called without receiving a matching request 99
+[08:47:03] RequestStore#acceptReply was called without receiving a matching request 100
+[08:47:03] RequestStore#acceptReply was called without receiving a matching request 101
+[08:47:03] RequestStore#acceptReply was called without receiving a matching request 102
+[08:47:03] RequestStore#acceptReply was called without receiving a matching request 103
+[08:47:03] RequestStore#acceptReply was called without receiving a matching request 104
+[08:47:04] [103.149.42.251][3a02a3aa][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+[08:47:10] [103.149.42.251][1e269af4][ManagementConnection] New connection established.
+[08:47:13] RequestStore#acceptReply was called without receiving a matching request 105
+[08:47:13] RequestStore#acceptReply was called without receiving a matching request 106
+[08:47:13] RequestStore#acceptReply was called without receiving a matching request 107
+[08:47:13] RequestStore#acceptReply was called without receiving a matching request 108
+[08:47:13] RequestStore#acceptReply was called without receiving a matching request 109
+[08:47:13] RequestStore#acceptReply was called without receiving a matching request 110
+[08:47:13] RequestStore#acceptReply was called without receiving a matching request 111
+[08:47:13] RequestStore#acceptReply was called without receiving a matching request 112
+[08:47:13] RequestStore#acceptReply was called without receiving a matching request 113
+[08:47:13] RequestStore#acceptReply was called without receiving a matching request 114
+[08:47:13] RequestStore#acceptReply was called without receiving a matching request 115
+[08:47:13] RequestStore#acceptReply was called without receiving a matching request 116
+[08:47:13] RequestStore#acceptReply was called without receiving a matching request 117
+[08:47:15] [103.149.42.251][4bc41647][ExtensionHostConnection] New connection established.
+[08:47:15] [103.149.42.251][4bc41647][ExtensionHostConnection] <713985> Launched Extension Host Process.
+[08:47:21] [103.149.42.251][1e269af4][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+Error: Unexpected SIGPIPE
+    at process.<anonymous> (file:///usr/lib/code-server/lib/vscode/out/server-main.js:214:8010)
+    at process.emit (node:events:530:35)
+[08:47:21] Error: Unexpected SIGPIPE
+    at process.<anonymous> (file:///usr/lib/code-server/lib/vscode/out/server-main.js:195:1327)
+    at process.emit (node:events:530:35)
+[08:47:21] [103.149.42.251][4bc41647][ExtensionHostConnection] <713985> Extension Host Process exited with code: 0, signal: null.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+[08:47:23] [103.149.42.251][5a9ab01b][ManagementConnection] New connection established.
+[08:47:28] [103.149.42.251][50b50491][ExtensionHostConnection] New connection established.
+[08:47:28] [103.149.42.251][50b50491][ExtensionHostConnection] <715783> Launched Extension Host Process.
+[09:09:58] [103.149.42.251][5a9ab01b][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+[09:09:58] [103.149.42.251][50b50491][ExtensionHostConnection] <715783> Extension Host Process exited with code: 0, signal: null.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda.js
+[09:10:05] [103.149.42.251][8d11aa85][ManagementConnection] New connection established.
+[09:10:11] [103.149.42.251][44bf671f][ExtensionHostConnection] New connection established.
+[09:10:11] [103.149.42.251][44bf671f][ExtensionHostConnection] <729254> Launched Extension Host Process.
+[09:10:34] [103.149.42.251][8d11aa85][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+[09:10:34] [103.149.42.251][44bf671f][ExtensionHostConnection] <729254> Extension Host Process exited with code: 0, signal: null.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+[09:10:40] [103.149.42.251][8abdbeb1][ManagementConnection] New connection established.
+[09:10:45] [103.149.42.251][1710ba66][ExtensionHostConnection] New connection established.
+[09:10:46] [103.149.42.251][1710ba66][ExtensionHostConnection] <731647> Launched Extension Host Process.
+[09:11:59] [103.149.42.251][8abdbeb1][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+[09:11:59] [103.149.42.251][1710ba66][ExtensionHostConnection] <731647> Extension Host Process exited with code: 0, signal: null.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+[09:12:05] [103.149.42.251][18c8c11f][ManagementConnection] New connection established.
+[09:12:11] [103.149.42.251][bdd64ed2][ExtensionHostConnection] New connection established.
+[09:12:11] [103.149.42.251][bdd64ed2][ExtensionHostConnection] <734554> Launched Extension Host Process.
+[09:13:23] [103.149.42.251][18c8c11f][ManagementConnection] The client has disconnected gracefully, so the connection will be disposed.
+[09:13:23] [103.149.42.251][bdd64ed2][ExtensionHostConnection] <734554> Extension Host Process exited with code: 0, signal: null.
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda.js
+[09:13:25] [103.149.42.251][0384a092][ManagementConnection] New connection established.
+[09:13:30] [103.149.42.251][7f1f7f25][ExtensionHostConnection] New connection established.
+[09:13:30] [103.149.42.251][7f1f7f25][ExtensionHostConnection] <737291> Launched Extension Host Process.
+[09:26:39] [File Watcher (node.js)] Watcher shutdown because watched path got deleted

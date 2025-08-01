@@ -12,25 +12,240 @@ class Kelas extends CI_Controller {
         date_default_timezone_set("asia/jakarta");
     }
 
-    public function index(){
-		if(!$this->session->userdata('userlogin'))    
-		{
-			return ;
-		}
+public function index()
+{
+    if (!$this->session->userdata('userlogin')) {
+        redirect('login');
+        return;
+    }
 
-		if(isset($_POST['kelas'])){
-			$kelas = [
-				'kelas' => $_POST['kelas']
-			];
+    if ($this->input->post('kelas')) {
+        $nama_kelas = $this->input->post('kelas');
+        $kelas = ['kelas' => $nama_kelas];
+        $this->m_data->insert_kelas($kelas);
 
-			$this->m_data->insert_kelas($kelas);
-			$data['message'] = "Berhasil menambahkan kelas"; 
-		}
+        $nama_kelas_clean = strtoupper(str_replace([' ', '-', '/'], '_', $nama_kelas));
+        $directory_path = './uploads/foto/' . $nama_kelas_clean . '/';
 
-		$data['kelas'] = $this->m_data->get_kelas();
-		$data['m_data'] = $this->m_data;
-		$this->load->view('i_kelas', $data);
-	}
+        if (!is_dir($directory_path)) {
+            mkdir($directory_path, 0777, true);
+        }
+
+        $data['message'] = "Berhasil menambahkan kelas dan membuat direktori.";
+    }
+
+    $data['kelas'] = $this->m_data->get_kelas();
+    $data['m_data'] = $this->m_data;
+    $this->load->view('i_kelas', $data);
+}
+
+    // FUNGSI BARU UNTUK UPLOAD FOTO KE DIREKTORI KELAS
+    public function upload_foto_kelas() {
+        if (!$this->session->userdata('userlogin')) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['status' => 'error', 'message' => 'Unauthorized access']));
+            return;
+        }
+
+        $id_kelas = $this->input->post('id_kelas');
+        
+        if (!$id_kelas) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['status' => 'error', 'message' => 'ID Kelas tidak ditemukan']));
+            return;
+        }
+
+        // Get kelas data
+        $kelas = $this->m_data->find_kelas($id_kelas);
+        if (!$kelas) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['status' => 'error', 'message' => 'Data kelas tidak ditemukan']));
+            return;
+        }
+
+        // Create directory path
+        $nama_kelas_clean = strtoupper(str_replace([' ', '-', '/'], '_', $kelas->kelas));
+        $directory_path = './uploads/foto/' . $nama_kelas_clean . '/';
+
+        if (!is_dir($directory_path)) {
+            mkdir($directory_path, 0777, true);
+        }
+
+        // Check if files were uploaded
+        if (empty($_FILES['foto_files']['name'][0])) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['status' => 'error', 'message' => 'Tidak ada file yang dipilih']));
+            return;
+        }
+
+        $uploaded_files = [];
+        $failed_files = [];
+        $total_files = count($_FILES['foto_files']['name']);
+
+        // Configure upload settings
+        $config['upload_path'] = $directory_path;
+        $config['allowed_types'] = 'jpg|jpeg|png|gif|bmp';
+        $config['max_size'] = 5120; // 5MB
+        $config['encrypt_name'] = false;
+
+        $this->load->library('upload');
+
+        // Process each file
+        for ($i = 0; $i < $total_files; $i++) {
+            if ($_FILES['foto_files']['error'][$i] !== UPLOAD_ERR_OK) {
+                $failed_files[] = $_FILES['foto_files']['name'][$i] . ' (Error: ' . $_FILES['foto_files']['error'][$i] . ')';
+                continue;
+            }
+
+            // Create individual file array for CodeIgniter upload library
+            $_FILES['single_file']['name'] = $_FILES['foto_files']['name'][$i];
+            $_FILES['single_file']['type'] = $_FILES['foto_files']['type'][$i];
+            $_FILES['single_file']['tmp_name'] = $_FILES['foto_files']['tmp_name'][$i];
+            $_FILES['single_file']['error'] = $_FILES['foto_files']['error'][$i];
+            $_FILES['single_file']['size'] = $_FILES['foto_files']['size'][$i];
+
+            // Set filename
+            $file_extension = pathinfo($_FILES['foto_files']['name'][$i], PATHINFO_EXTENSION);
+            $config['file_name'] = $nama_kelas_clean . '_' . time() . '_' . ($i + 1) . '.' . $file_extension;
+
+            $this->upload->initialize($config);
+
+            if ($this->upload->do_upload('single_file')) {
+                $upload_data = $this->upload->data();
+                $uploaded_files[] = $upload_data['file_name'];
+            } else {
+                $failed_files[] = $_FILES['foto_files']['name'][$i] . ' (' . strip_tags($this->upload->display_errors()) . ')';
+            }
+        }
+
+        // Prepare response
+        $response = [
+            'status' => 'success',
+            'message' => 'Upload selesai',
+            'uploaded_count' => count($uploaded_files),
+            'failed_count' => count($failed_files),
+            'uploaded_files' => $uploaded_files,
+            'failed_files' => $failed_files,
+            'directory' => $directory_path
+        ];
+
+        if (count($uploaded_files) > 0 && count($failed_files) > 0) {
+            $response['message'] = 'Upload sebagian berhasil. ' . count($uploaded_files) . ' file berhasil, ' . count($failed_files) . ' file gagal.';
+        } elseif (count($uploaded_files) > 0) {
+            $response['message'] = 'Semua file berhasil diupload. Total: ' . count($uploaded_files) . ' file.';
+        } else {
+            $response['status'] = 'error';
+            $response['message'] = 'Semua file gagal diupload.';
+        }
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($response));
+    }
+
+    // FUNGSI UNTUK MELIHAT FOTO-FOTO DI DIREKTORI KELAS
+    public function lihat_foto_kelas($id_kelas = null) {
+        if (!$this->session->userdata('userlogin')) {
+            redirect('login');
+            return;
+        }
+
+        if (!$id_kelas) {
+            $this->session->set_flashdata('error', 'ID Kelas tidak ditemukan');
+            redirect(base_url('kelas'));
+            return;
+        }
+
+        $kelas = $this->m_data->find_kelas($id_kelas);
+        if (!$kelas) {
+            $this->session->set_flashdata('error', 'Data kelas tidak ditemukan');
+            redirect(base_url('kelas'));
+            return;
+        }
+
+        // Get photos from directory
+        $nama_kelas_clean = strtoupper(str_replace([' ', '-', '/'], '_', $kelas->kelas));
+        $directory_path = './uploads/foto/' . $nama_kelas_clean . '/';
+        
+        $foto_files = [];
+        if (is_dir($directory_path)) {
+            $files = scandir($directory_path);
+            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
+            
+            foreach ($files as $file) {
+                if ($file != '.' && $file != '..') {
+                    $file_extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                    if (in_array($file_extension, $allowed_extensions)) {
+                        $foto_files[] = [
+                            'filename' => $file,
+                            'path' => $directory_path . $file,
+                            'url' => base_url('uploads/foto/' . $nama_kelas_clean . '/' . $file),
+                            'size' => filesize($directory_path . $file)
+                        ];
+                    }
+                }
+            }
+        }
+
+        $data = [
+            'kelas' => $kelas,
+            'foto_files' => $foto_files,
+            'directory_path' => $directory_path
+        ];
+
+        $this->load->view('i_foto_kelas', $data);
+    }
+
+    // FUNGSI UNTUK HAPUS FOTO DARI DIREKTORI KELAS
+    public function hapus_foto_kelas() {
+        if (!$this->session->userdata('userlogin')) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['status' => 'error', 'message' => 'Unauthorized access']));
+            return;
+        }
+
+        $id_kelas = $this->input->post('id_kelas');
+        $filename = $this->input->post('filename');
+
+        if (!$id_kelas || !$filename) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['status' => 'error', 'message' => 'Data tidak lengkap']));
+            return;
+        }
+
+        $kelas = $this->m_data->find_kelas($id_kelas);
+        if (!$kelas) {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['status' => 'error', 'message' => 'Data kelas tidak ditemukan']));
+            return;
+        }
+
+        $nama_kelas_clean = strtoupper(str_replace([' ', '-', '/'], '_', $kelas->kelas));
+        $file_path = './uploads/foto/' . $nama_kelas_clean . '/' . $filename;
+
+        if (file_exists($file_path)) {
+            if (unlink($file_path)) {
+                $this->output
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode(['status' => 'success', 'message' => 'Foto berhasil dihapus']));
+            } else {
+                $this->output
+                    ->set_content_type('application/json')
+                    ->set_output(json_encode(['status' => 'error', 'message' => 'Gagal menghapus foto']));
+            }
+        } else {
+            $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode(['status' => 'error', 'message' => 'File tidak ditemukan']));
+        }
+    }
     
     public function detail_murid($id_murid = null) {
         if (!$this->session->userdata('userlogin')) {

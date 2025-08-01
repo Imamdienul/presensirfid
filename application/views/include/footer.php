@@ -49,6 +49,7 @@
 <script src="<?= base_url(); ?>assets/js/app.js"></script>
 
 <script>
+    // Navigation Search Functionality
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('nav-search');
         const searchResults = document.getElementById('search-results');
@@ -154,7 +155,10 @@
         }
     });
 
+    // jQuery Document Ready Functions
     $(document).ready(function() {
+        
+        // Phone Update Functionality
         if ($('#phone-input').length && $('#save-phone').length) {
             var originalPhone = $('#phone-input').val();
             
@@ -226,6 +230,140 @@
             });
         }
         
+        // Photo Upload Functionality
+        $('#foto_files').on('change', function() {
+            var files = this.files;
+            var preview = $('#file_preview');
+            preview.empty();
+            
+            if (files.length > 0) {
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    var reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        var col = $('<div class="col-md-3 mb-2">');
+                        var img = $('<img class="img-thumbnail" style="height: 100px; width: 100%; object-fit: cover;">');
+                        img.attr('src', e.target.result);
+                        col.append(img);
+                        preview.append(col);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+        
+        // Upload foto
+        $('#btnUpload').on('click', function() {
+            var files = $('#foto_files')[0].files;
+            
+            if (files.length === 0) {
+                alert('Pilih foto terlebih dahulu!');
+                return;
+            }
+            
+            var formData = new FormData();
+            formData.append('id_kelas', $('input[name="id_kelas"]').val());
+            
+            for (var i = 0; i < files.length; i++) {
+                formData.append('foto_files[]', files[i]);
+            }
+            
+            // Show progress bar
+            $('#upload_progress').show();
+            $('#btnUpload').prop('disabled', true).text('Uploading...');
+            
+            $.ajax({
+                url: '<?= base_url("kelas/upload_foto_kelas"); ?>',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                xhr: function() {
+                    var xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable) {
+                            var percentComplete = (evt.loaded / evt.total) * 100;
+                            $('#upload_progress .progress-bar').css('width', percentComplete + '%');
+                        }
+                    }, false);
+                    return xhr;
+                },
+                success: function(response) {
+                    $('#upload_progress').hide();
+                    $('#btnUpload').prop('disabled', false).text('Upload Foto');
+                    
+                    if (response.status === 'success') {
+                        var resultHtml = '<div class="alert alert-success">';
+                        resultHtml += '<strong>Upload Berhasil!</strong><br>';
+                        resultHtml += response.message + '<br>';
+                        
+                        if (response.uploaded_files && response.uploaded_files.length > 0) {
+                            resultHtml += '<br><strong>File yang berhasil diupload:</strong><ul>';
+                            response.uploaded_files.forEach(function(file) {
+                                resultHtml += '<li>' + file + '</li>';
+                            });
+                            resultHtml += '</ul>';
+                        }
+                        
+                        if (response.failed_files && response.failed_files.length > 0) {
+                            resultHtml += '<br><strong>File yang gagal diupload:</strong><ul>';
+                            response.failed_files.forEach(function(file) {
+                                resultHtml += '<li>' + file + '</li>';
+                            });
+                            resultHtml += '</ul>';
+                        }
+                        
+                        resultHtml += '</div>';
+                        $('#upload_result').html(resultHtml);
+                        
+                        // Reset form
+                        $('#foto_files').val('');
+                        $('#file_preview').empty();
+                        
+                        // Reload halaman setelah 2 detik jika upload berhasil sepenuhnya
+                        if (!response.failed_files || response.failed_files.length === 0) {
+                            setTimeout(function() {
+                                location.reload();
+                            }, 2000);
+                        }
+                        
+                    } else {
+                        var errorHtml = '<div class="alert alert-danger">';
+                        errorHtml += '<strong>Upload Gagal!</strong><br>';
+                        errorHtml += response.message;
+                        
+                        if (response.failed_files && response.failed_files.length > 0) {
+                            errorHtml += '<br><br><strong>Detail error:</strong><ul>';
+                            response.failed_files.forEach(function(file) {
+                                errorHtml += '<li>' + file + '</li>';
+                            });
+                            errorHtml += '</ul>';
+                        }
+                        
+                        errorHtml += '</div>';
+                        $('#upload_result').html(errorHtml);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#upload_progress').hide();
+                    $('#btnUpload').prop('disabled', false).text('Upload Foto');
+                    $('#upload_result').html('<div class="alert alert-danger"><strong>Error!</strong> Terjadi kesalahan saat upload: ' + error + '</div>');
+                }
+            });
+        });
+        
+        // Reset modal saat ditutup
+        $('#uploadFotoModal').on('hidden.bs.modal', function() {
+            $('#foto_files').val('');
+            $('#file_preview').empty();
+            $('#upload_result').empty();
+            $('#upload_progress').hide();
+            $('#btnUpload').prop('disabled', false).text('Upload Foto');
+        });
+        
+        // Helper function untuk menampilkan pesan phone update
         function showMessage(message, type) {
             if ($('#phone-message').length) {
                 var alertClass = 'alert-' + type;
@@ -243,6 +381,64 @@
             }
         }
     });
+
+    // Global Functions for Photo Management
+    
+    // Fungsi untuk membuka modal preview foto
+    function openModal(url, filename) {
+        $('#modalImage').attr('src', url);
+        $('#modalFilename').text(filename);
+        $('#downloadLink').attr('href', url).attr('download', filename);
+        $('#viewFotoModal').modal('show');
+    }
+
+    // Fungsi untuk hapus foto
+    function hapusFoto(filename) {
+        if (confirm('Apakah Anda yakin ingin menghapus foto: ' + filename + '?')) {
+            $.ajax({
+                url: '<?= base_url("kelas/hapus_foto_kelas"); ?>',
+                type: 'POST',
+                data: {
+                    id_kelas: '<?= $kelas->id; ?>',
+                    filename: filename
+                },
+                success: function(response) {
+                    if (response.status === 'success') {
+                        // Hapus card dari tampilan
+                        $('[data-filename="' + filename + '"]').fadeOut(300, function() {
+                            $(this).remove();
+                            
+                            // Cek apakah masih ada foto
+                            if ($('#foto-gallery .col-lg-3').length === 0) {
+                                location.reload();
+                            }
+                        });
+                        
+                        // Tampilkan pesan sukses
+                        if (typeof toastr !== 'undefined') {
+                            toastr.success(response.message);
+                        } else {
+                            alert(response.message);
+                        }
+                    } else {
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error(response.message);
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    var errorMsg = 'Terjadi kesalahan saat menghapus foto: ' + error;
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error(errorMsg);
+                    } else {
+                        alert(errorMsg);
+                    }
+                }
+            });
+        }
+    }
 </script>
 </body>
 </html>
