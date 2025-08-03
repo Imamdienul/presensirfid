@@ -16,6 +16,12 @@ class Api extends CI_Controller {
 	}
 
 	private function send_whatsapp_notification($phone_number, $message) {
+		$wa_config = $this->m_api->get_whatsapp_config();
+		
+		if (!$wa_config || empty($wa_config->api_key)) {
+			error_log("WhatsApp configuration not found or API key is empty");
+			return false;
+		}
 		
 		$phone_number = preg_replace('/[^0-9]/', '', $phone_number);
 		if (substr($phone_number, 0, 1) == '0') {
@@ -23,14 +29,14 @@ class Api extends CI_Controller {
 		}
 		
 		$body = array(
-			"api_key" => "839d1e368496506ae5f4080b1a60cfb7dd18f00e", 
+			"api_key" => $wa_config->api_key, 
 			"receiver" => $phone_number,
 			"data" => array("message" => $message)
 		);
 		
 		$curl = curl_init();
 		curl_setopt_array($curl, [
-			CURLOPT_URL => "https://whatsapp.gisaka.media/api/send-message",
+			CURLOPT_URL => $wa_config->api_url,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING => "",
 			CURLOPT_MAXREDIRS => 10,
@@ -98,7 +104,6 @@ class Api extends CI_Controller {
 		
 		return $message;
 	}
-
 	public function manualabsensijson() {
 		if (isset($_GET['key']) && isset($_GET['iddev']) && isset($_GET['id_siswa'])) {
 			$key = $this->input->get('key');

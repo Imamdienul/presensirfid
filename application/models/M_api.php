@@ -86,6 +86,34 @@ class M_api extends CI_Model {
 		$this->db->insert('absensi', $data);
        return TRUE;
 	}
+    function get_whatsapp_config() {
+        $this->db->select('*');
+        $this->db->from('whatsapp_config');
+        $this->db->where('id', 1);
+        $query = $this->db->get();
+        
+        if ($query->num_rows() > 0) {
+            return $query->row();
+        }
+        return null;
+    }
+    
+    function update_whatsapp_config($data) {
+        $this->db->where('id', 1);
+        $this->db->update('whatsapp_config', $data);
+        return $this->db->affected_rows() > 0;
+    }
+    
+    function insert_whatsapp_config($data) {
+        $this->db->insert('whatsapp_config', $data);
+        return $this->db->insert_id();
+    }
+    
+    function check_whatsapp_config_exists() {
+        $this->db->from('whatsapp_config');
+        $this->db->where('id', 1);
+        return $this->db->count_all_results() > 0;
+    }
 	function get_absensi($ket,$today,$tomorrow){
         $this->db->select('*');
         $this->db->from('absensi');

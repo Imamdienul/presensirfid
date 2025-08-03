@@ -253,11 +253,19 @@ $avatar = $this->session->userdata('avatar');
                                         <span>APP Settings</span>
                                     </a>
                                 </li>
-                                <li>
-                                    <a href="<?= base_url() ?>ota">
-                                        <i class="mdi mdi-airplane"></i>
-                                        <span>Over The Air</span>
-                                    </a>
+                               <li>
+    <a href="<?= base_url() ?>whatsapp">
+        <i class="mdi mdi-whatsapp"></i>
+        <span>Whatsapp Settings</span>
+    </a>
+</li>
+<li>
+    <a href="<?= base_url() ?>ota">
+        <i class="mdi mdi-airplane"></i>
+        <span>Over The Air</span>
+    </a>
+</li>
+
                                 </li>
                             </ul>
                         </li>
@@ -318,3 +326,6 @@ $avatar = $this->session->userdata('avatar');
                         <div class="clearfix"></div>
                     </nav>
                 </div>
+
+
+                //KONTEN DI GFENERATE PHP 
