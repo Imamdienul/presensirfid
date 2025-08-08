@@ -12,3 +12,4 @@ application/config/database.php
 /uploads/foto/*.png
 /uplaods/foto_siswa/*/*.png
 /uploads/foto/__MACOSX/
+code-server.log
