@@ -53,12 +53,16 @@
                                         <td>
                                             <!-- Form untuk edit nomor telepon -->
                                             <form id="phone-form" style="display: inline-block;">
-                                                <div class="input-group" style="width: 300px;">
+                                                <div class="input-group" style="width: 400px;">
                                                     <input type="hidden" id="murid-id" value="<?= $murid->id_siswa ?>">
                                                     <input type="text" id="phone-input" class="form-control" value="<?= $murid->telp; ?>" maxlength="15">
                                                     <div class="input-group-append">
                                                         <button type="button" id="save-phone" class="btn btn-success btn-sm">
                                                             <i class="fa fa-save"></i> Save
+                                                        </button>
+                                                        <!-- Tombol WhatsApp -->
+                                                        <button type="button" id="whatsapp-btn" class="btn btn-whatsapp btn-sm ml-2" onclick="hubungiOrangTua('<?= $murid->telp; ?>', '<?= $murid->nama; ?>')">
+                                                            <i class="fab fa-whatsapp"></i> Hubungi Orang Tua
                                                         </button>
                                                     </div>
                                                 </div>
@@ -135,6 +139,23 @@
         overflow-y: auto;
         padding: 10px;
         margin-top: 70px;
+    }
+
+    /* Style untuk tombol WhatsApp */
+    .btn-whatsapp {
+        background-color: #25D366;
+        border-color: #25D366;
+        color: white;
+    }
+
+    .btn-whatsapp:hover {
+        background-color: #128C7E;
+        border-color: #128C7E;
+        color: white;
+    }
+
+    .btn-whatsapp:focus, .btn-whatsapp.focus {
+        box-shadow: 0 0 0 0.2rem rgba(37, 211, 102, 0.5);
     }
 
     .card.kartu-siswa {
@@ -238,6 +259,58 @@
     }
 </style>
 
+<script>
+function hubungiOrangTua(nomorTelp, namaSiswa) {
+    // Validasi nomor telepon
+    if (!nomorTelp || nomorTelp.trim() === '') {
+        alert('Nomor telepon orang tua belum diisi!');
+        return;
+    }
+    
+    // Format nomor telepon untuk WhatsApp
+    let phoneNumber = nomorTelp.replace(/\D/g, ''); // Hapus karakter non-digit
+    
+    // Jika nomor dimulai dengan 0, ganti dengan 62
+    if (phoneNumber.startsWith('0')) {
+        phoneNumber = '62' + phoneNumber.substring(1);
+    }
+    // Jika belum ada kode negara, tambahkan 62
+    else if (!phoneNumber.startsWith('62')) {
+        phoneNumber = '62' + phoneNumber;
+    }
+    
+    // Pesan untuk verifikasi orang tua
+    const message = `Selamat pagi/siang/sore. Saya dari sekolah ingin mengkonfirmasi, apakah benar ini adalah nomor orang tua dari ${namaSiswa}? 
 
+Nomor ini akan digunakan untuk notifikasi absensi dan informasi penting terkait siswa. 
+
+Mohon konfirmasinya. Terima kasih.`;
+    
+    // Encode pesan untuk URL
+    const encodedMessage = encodeURIComponent(message);
+    
+    // URL WhatsApp
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    
+    // Buka WhatsApp
+    window.open(whatsappUrl, '_blank');
+}
+
+// Update fungsi save phone untuk mengupdate tombol WhatsApp juga
+document.addEventListener('DOMContentLoaded', function() {
+    const savePhoneBtn = document.getElementById('save-phone');
+    const phoneInput = document.getElementById('phone-input');
+    const whatsappBtn = document.getElementById('whatsapp-btn');
+    
+    if (savePhoneBtn) {
+        savePhoneBtn.addEventListener('click', function() {
+            // Update onclick attribute tombol WhatsApp dengan nomor terbaru
+            const newPhone = phoneInput.value;
+            const namaSiswa = '<?= $murid->nama; ?>';
+            whatsappBtn.setAttribute('onclick', `hubungiOrangTua('${newPhone}', '${namaSiswa}')`);
+        });
+    }
+});
+</script>
 
 <?php $this->load->view('include/footer.php'); ?>

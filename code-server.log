@@ -447,3 +447,10 @@ File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda.
 [15:11:14] Marked extension as removed tonybaloney.vscode-pets-1.32.0-universal
 [15:11:14] Extension installed successfully: tonybaloney.vscode-pets file:///root/.local/share/code-server/extensions/extensions.json
 File not found: /usr/lib/code-server/lib/vscode/node_modules/vscode-regexp-languagedetection/dist/index.js
+[15:52:49] [103.149.42.251][4f417c76][ManagementConnection] The client has disconnected, will wait for reconnection 3h before disposing...
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda_bg.wasm
+File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda.js
+[16:06:10] [103.149.42.251][4f417c76][ManagementConnection] Another client has connected, will shorten the wait for reconnection 5m before disposing...
+[16:06:10] [103.149.42.251][600ab0b1][ManagementConnection] New connection established.
+[16:06:12] [103.149.42.251][8bda81f7][ExtensionHostConnection] New connection established.
+[16:06:12] [103.149.42.251][8bda81f7][ExtensionHostConnection] <3135810> Launched Extension Host Process.
