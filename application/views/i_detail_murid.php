@@ -36,7 +36,6 @@
                         
                         <!-- Alert untuk pesan -->
                         <div id="phone-message" style="display: none;" class="alert"></div>
-                        <div id="whatsapp-message" style="display: none;" class="alert"></div>
                         
                         <div class="table-responsive">
                             <table class="table table-borderless">
@@ -54,7 +53,7 @@
                                         <td>
                                             <!-- Form untuk edit nomor telepon -->
                                             <form id="phone-form" style="display: inline-block;">
-                                                <div class="input-group" style="width: 600px;">
+                                                <div class="input-group" style="width: 400px;">
                                                     <input type="hidden" id="murid-id" value="<?= $murid->id_siswa ?>">
                                                     <input type="text" id="phone-input" class="form-control" value="<?= $murid->telp; ?>" maxlength="15">
                                                     <div class="input-group-append">
@@ -63,11 +62,7 @@
                                                         </button>
                                                         <!-- Tombol WhatsApp -->
                                                         <button type="button" id="whatsapp-btn" class="btn btn-whatsapp btn-sm ml-2" onclick="hubungiOrangTua('<?= $murid->telp; ?>', '<?= $murid->nama; ?>')">
-                                                            <i class="fab fa-whatsapp"></i> Hubungi
-                                                        </button>
-                                                        <!-- Tombol Kirim Notifikasi Test -->
-                                                        <button type="button" id="test-notif-btn" class="btn btn-primary btn-sm ml-2">
-                                                            <i class="fa fa-paper-plane"></i> Test Notifikasi
+                                                            <i class="fab fa-whatsapp"></i> Hubungi Orang Tua
                                                         </button>
                                                     </div>
                                                 </div>
@@ -89,53 +84,12 @@
                                 </tbody>
                             </table>
                         </div>
-
-                        <!-- Card untuk Test WhatsApp -->
-                        <div class="card mt-4">
-                            <div class="card-header">
-                                <h5><i class="fab fa-whatsapp text-success"></i> Test Notifikasi WhatsApp</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Jenis Notifikasi</label>
-                                            <select id="notif-type" class="form-control">
-                                                <option value="masuk">Absensi Masuk</option>
-                                                <option value="keluar">Absensi Keluar</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Mode Absensi</label>
-                                            <select id="manual-mode" class="form-control">
-                                                <option value="false">RFID (Otomatis)</option>
-                                                <option value="true">Manual</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="button" id="send-whatsapp-test" class="btn btn-success btn-block">
-                                    <i class="fab fa-whatsapp"></i> Kirim Test Notifikasi WhatsApp
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Preview Pesan -->
-                        <div id="message-preview" class="card mt-3" style="display: none;">
-                            <div class="card-header">
-                                <h6><i class="fa fa-eye"></i> Preview Pesan</h6>
-                            </div>
-                            <div class="card-body">
-                                <pre id="preview-content" style="white-space: pre-wrap; font-family: monospace; background: #f8f9fa; padding: 15px; border-radius: 5px;"></pre>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
             <!-- End details column -->
         </div>
+        <!-- End murid details and photos -->
 
         <div class="text-center">
             <h4 class="header-title" style="margin-bottom: 20px; text-transform: uppercase;">Kartu Siswa</h4>
@@ -269,31 +223,6 @@
         font-weight: bold;
     }
 
-    /* Loading spinner */
-    .btn-loading {
-        position: relative;
-    }
-
-    .btn-loading:after {
-        content: '';
-        position: absolute;
-        width: 16px;
-        height: 16px;
-        margin: auto;
-        border: 2px solid transparent;
-        border-top-color: #ffffff;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
-
-    @keyframes spin {
-        0% { transform: translate(-50%, -50%) rotate(0deg); }
-        100% { transform: translate(-50%, -50%) rotate(360deg); }
-    }
-
     @media print {
         body {
             margin: 0;
@@ -330,7 +259,6 @@
     }
 </style>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 function hubungiOrangTua(nomorTelp, namaSiswa) {
     // Validasi nomor telepon
@@ -368,114 +296,20 @@ Mohon konfirmasinya. Terima kasih.`;
     window.open(whatsappUrl, '_blank');
 }
 
-function showMessage(type, message) {
-    const alertDiv = $('#whatsapp-message');
-    alertDiv.removeClass('alert-success alert-danger alert-warning alert-info');
-    alertDiv.addClass('alert-' + type);
-    alertDiv.text(message);
-    alertDiv.show();
+// Update fungsi save phone untuk mengupdate tombol WhatsApp juga
+document.addEventListener('DOMContentLoaded', function() {
+    const savePhoneBtn = document.getElementById('save-phone');
+    const phoneInput = document.getElementById('phone-input');
+    const whatsappBtn = document.getElementById('whatsapp-btn');
     
-    // Auto hide after 5 seconds
-    setTimeout(() => {
-        alertDiv.fadeOut();
-    }, 5000);
-}
-
-function sendWhatsAppNotification(phone, nama, keterangan, isManual = false) {
-    const button = $('#send-whatsapp-test');
-    const originalText = button.html();
-    
-    // Show loading
-    button.prop('disabled', true);
-    button.addClass('btn-loading');
-    button.html('<i class="fa fa-spinner fa-spin"></i> Mengirim...');
-    
-    // Prepare data
-    const postData = {
-        phone: phone,
-        nama: nama,
-        student_id: $('#murid-id').val(),
-        keterangan: keterangan,
-        is_manual: isManual
-    };
-    
-    // AJAX call to your existing API endpoint
-    $.ajax({
-        url: '<?= base_url("api/test_whatsapp") ?>',
-        type: 'GET',
-        data: postData,
-        dataType: 'json',
-        success: function(response) {
-            if (response.status === 'success') {
-                showMessage('success', 'Notifikasi WhatsApp berhasil dikirim!');
-                
-                // Show preview
-                $('#preview-content').text(response.message_sent);
-                $('#message-preview').show();
-                
-                console.log('API Response:', response);
-            } else {
-                showMessage('danger', 'Gagal mengirim notifikasi: ' + (response.message || 'Unknown error'));
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('AJAX Error:', error);
-            console.error('Response:', xhr.responseText);
-            showMessage('danger', 'Terjadi kesalahan saat mengirim notifikasi: ' + error);
-        },
-        complete: function() {
-            // Reset button
-            button.prop('disabled', false);
-            button.removeClass('btn-loading');
-            button.html(originalText);
-        }
-    });
-}
-
-// Document ready
-$(document).ready(function() {
-    // Save phone button
-    $('#save-phone').click(function() {
-        const newPhone = $('#phone-input').val();
-        const namaSiswa = '<?= $murid->nama; ?>';
-        $('#whatsapp-btn').attr('onclick', `hubungiOrangTua('${newPhone}', '${namaSiswa}')`);
-        showMessage('info', 'Nomor telepon berhasil diperbarui!');
-    });
-    
-    // Test notification button
-    $('#test-notif-btn').click(function() {
-        const phone = $('#phone-input').val();
-        if (!phone || phone.trim() === '') {
-            showMessage('warning', 'Mohon isi nomor telepon terlebih dahulu!');
-            return;
-        }
-        
-        const nama = '<?= $murid->nama; ?>';
-        const keterangan = $('#notif-type').val();
-        const isManual = $('#manual-mode').val() === 'true';
-        
-        sendWhatsAppNotification(phone, nama, keterangan, isManual);
-    });
-    
-    // Send WhatsApp test button
-    $('#send-whatsapp-test').click(function() {
-        const phone = $('#phone-input').val();
-        if (!phone || phone.trim() === '') {
-            showMessage('warning', 'Mohon isi nomor telepon terlebih dahulu!');
-            return;
-        }
-        
-        const nama = '<?= $murid->nama; ?>';
-        const keterangan = $('#notif-type').val();
-        const isManual = $('#manual-mode').val() === 'true';
-        
-        sendWhatsAppNotification(phone, nama, keterangan, isManual);
-    });
-    
-    // Preview message when options change
-    $('#notif-type, #manual-mode').change(function() {
-        $('#message-preview').hide();
-    });
+    if (savePhoneBtn) {
+        savePhoneBtn.addEventListener('click', function() {
+            // Update onclick attribute tombol WhatsApp dengan nomor terbaru
+            const newPhone = phoneInput.value;
+            const namaSiswa = '<?= $murid->nama; ?>';
+            whatsappBtn.setAttribute('onclick', `hubungiOrangTua('${newPhone}', '${namaSiswa}')`);
+        });
+    }
 });
 </script>
 

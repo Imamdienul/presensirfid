@@ -586,4 +586,137 @@ public function save_edit_siswa() {
         redirect(base_url() . 'login');
     }
 }
+public function get_whatsapp_templates() {
+    if (!$this->session->userdata('userlogin')) {
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(['status' => 'error', 'message' => 'Unauthorized access']));
+        return;
+    }
+
+    $templates = array(
+        'verification' => 'Selamat pagi/siang/sore. Saya dari sekolah ingin mengkonfirmasi, apakah benar ini adalah nomor orang tua dari {nama_siswa}? \n\nNomor ini akan digunakan untuk notifikasi absensi dan informasi penting terkait siswa. \n\nMohon konfirmasinya. Terima kasih.',
+        
+        'absent_notification' => 'Yth. Orang tua/wali {nama_siswa},\n\nPutra/putri Anda tidak hadir di sekolah pada hari {tanggal}.\n\nMohon konfirmasi alasan ketidakhadiran melalui guru kelas atau pihak sekolah.\n\nTerima kasih.',
+        
+        'reminder' => 'Yth. Orang tua/wali {nama_siswa},\n\nIni adalah pengingat untuk hari {tanggal}.\n\nMohon pastikan {nama_siswa} hadir tepat waktu di sekolah.\n\nTerima kasih atas perhatiannya.\n\nSalam,\nTim Sekolah',
+        
+        'info_sekolah' => 'Yth. Orang tua/wali {nama_siswa},\n\nAda informasi penting dari sekolah:\n\n{info_content}\n\nMohon diperhatikan dan ditindaklanjuti sesuai kebutuhan.\n\nTerima kasih.\n\nSalam,\nSekolah'
+    );
+
+    $this->output
+        ->set_content_type('application/json')
+        ->set_output(json_encode(['status' => 'success', 'templates' => $templates]));
+}
+public function send_whatsapp() {
+    if (!$this->session->userdata('userlogin')) {
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(['status' => 'error', 'message' => 'Unauthorized access']));
+        return;
+    }
+
+    if ($this->input->server('REQUEST_METHOD') !== 'POST') {
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(['status' => 'error', 'message' => 'Method not allowed']));
+        return;
+    }
+
+    $phone = $this->input->post('phone');
+    $message = $this->input->post('message');
+
+    // Validasi input
+    if (empty($phone) || empty($message)) {
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(['status' => 'error', 'message' => 'Nomor HP dan pesan tidak boleh kosong']));
+        return;
+    }
+
+    // Load model untuk mendapatkan konfigurasi WhatsApp
+    $this->load->model('m_api');
+    $wa_config = $this->m_api->get_whatsapp_config();
+
+    if (!$wa_config || empty($wa_config->api_key) || $wa_config->status != 1) {
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(['status' => 'error', 'message' => 'Konfigurasi WhatsApp belum diatur atau sedang nonaktif']));
+        return;
+    }
+
+    // Format nomor telepon
+    $phone = preg_replace('/[^0-9]/', '', $phone);
+    if (substr($phone, 0, 1) == '0') {
+        $phone = '62' . substr($phone, 1);
+    } else if (!substr($phone, 0, 2) == '62') {
+        $phone = '62' . $phone;
+    }
+
+    // Siapkan data untuk API
+    $body = array(
+        "api_key" => $wa_config->api_key,
+        "receiver" => $phone,
+        "data" => array("message" => $message)
+    );
+
+    // Kirim request ke API WhatsApp
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+        CURLOPT_URL => $wa_config->api_url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "POST",
+        CURLOPT_POSTFIELDS => json_encode($body),
+        CURLOPT_HTTPHEADER => [
+            "Accept: */*",
+            "Content-Type: application/json",
+        ],
+    ]);
+
+    $response = curl_exec($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $err = curl_error($curl);
+    curl_close($curl);
+
+    // Handle response
+    if ($err) {
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(['status' => 'error', 'message' => 'Error koneksi: ' . $err]));
+        return;
+    }
+
+    $response_data = json_decode($response, true);
+    
+    // Log untuk debugging (opsional)
+    log_message('info', 'WhatsApp API Response: ' . $response);
+    log_message('info', 'HTTP Code: ' . $httpCode);
+
+    // Cek respons API
+    if ($httpCode == 200 && $response_data && isset($response_data['status']) && $response_data['status'] == 'success') {
+        // Simpan log pengiriman WhatsApp (opsional)
+       
+        
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(['status' => 'success', 'message' => 'Pesan WhatsApp berhasil dikirim!']));
+    } else {
+        // Simpan log pengiriman WhatsApp yang gagal (opsional)
+       
+        
+        $error_message = 'Gagal mengirim pesan WhatsApp';
+        if ($response_data && isset($response_data['message'])) {
+            $error_message .= ': ' . $response_data['message'];
+        }
+        
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(['status' => 'error', 'message' => $error_message]));
+    }
+}
+
 }
