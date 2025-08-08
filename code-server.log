@@ -454,3 +454,5 @@ File not found: /usr/lib/code-server/lib/vscode/node_modules/vsda/rust/web/vsda.
 [16:06:10] [103.149.42.251][600ab0b1][ManagementConnection] New connection established.
 [16:06:12] [103.149.42.251][8bda81f7][ExtensionHostConnection] New connection established.
 [16:06:12] [103.149.42.251][8bda81f7][ExtensionHostConnection] <3135810> Launched Extension Host Process.
+[16:11:10] [103.149.42.251][eec9d4e4][ExtensionHostConnection] <3040376> Extension Host Process exited with code: 0, signal: null.
+[16:11:11] [103.149.42.251][4f417c76][ManagementConnection] The reconnection short grace time of 5m has expired, so the connection will be disposed.
