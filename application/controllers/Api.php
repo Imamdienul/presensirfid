@@ -14,6 +14,71 @@ class Api extends CI_Controller {
 	{
 		$this->load->view('i_api');
 	}
+    public function whatsapp_notif_direct() {
+    $log_message = "[" . date('Y-m-d H:i:s') . "] WhatsApp direct endpoint called\n";
+    file_put_contents(FCPATH.'application/logs/whatsapp_debug_'.date('Y-m-d').'.log', $log_message, FILE_APPEND);
+    
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id_siswa = $this->input->post('id_siswa');
+        $keterangan = $this->input->post('keterangan');
+        $is_manual = $this->input->post('is_manual') === '1';
+        $log_message = "[" . date('Y-m-d H:i:s') . "] Parameters - ID: {$id_siswa}, Ket: {$keterangan}, Manual: " . ($is_manual ? 'true' : 'false') . "\n";
+        file_put_contents(FCPATH.'application/logs/whatsapp_debug_'.date('Y-m-d').'.log', $log_message, FILE_APPEND);
+        
+        if (!empty($id_siswa) && !empty($keterangan)) {
+            try {
+                $siswa = $this->m_api->get_siswa_by_id($id_siswa);
+                
+                if (!empty($siswa) && is_array($siswa)) {
+                    $siswa_data = $siswa[0];
+                    $log_message = "[" . date('Y-m-d H:i:s') . "] Siswa found: {$siswa_data->nama}, Phone: " . (isset($siswa_data->telp) ? $siswa_data->telp : 'N/A') . "\n";
+                    file_put_contents(FCPATH.'application/logs/whatsapp_debug_'.date('Y-m-d').'.log', $log_message, FILE_APPEND);
+                    
+                    if (!empty($siswa_data->telp)) {
+                        $message = $this->create_whatsapp_message(
+                            $siswa_data->nama, 
+                            $keterangan, 
+                            time(), 
+                            $is_manual
+                        );
+                        
+                        $result = $this->send_whatsapp_notification($siswa_data->telp, $message);
+                        
+                        if ($result) {
+                            $log_message = "[" . date('Y-m-d H:i:s') . "] WhatsApp sent successfully to {$siswa_data->nama} ({$siswa_data->telp})\n";
+                            echo json_encode(['status' => 'success', 'message' => 'WhatsApp sent successfully']);
+                        } else {
+                            $log_message = "[" . date('Y-m-d H:i:s') . "] Failed to send WhatsApp to {$siswa_data->nama} ({$siswa_data->telp})\n";
+                            echo json_encode(['status' => 'error', 'message' => 'Failed to send WhatsApp']);
+                        }
+                        
+                        file_put_contents(FCPATH.'application/logs/whatsapp_debug_'.date('Y-m-d').'.log', $log_message, FILE_APPEND);
+                    } else {
+                        $log_message = "[" . date('Y-m-d H:i:s') . "] No phone number for siswa: {$siswa_data->nama}\n";
+                        file_put_contents(FCPATH.'application/logs/whatsapp_debug_'.date('Y-m-d').'.log', $log_message, FILE_APPEND);
+                        echo json_encode(['status' => 'warning', 'message' => 'No phone number']);
+                    }
+                } else {
+                    $log_message = "[" . date('Y-m-d H:i:s') . "] Siswa not found with ID: {$id_siswa}\n";
+                    file_put_contents(FCPATH.'application/logs/whatsapp_debug_'.date('Y-m-d').'.log', $log_message, FILE_APPEND);
+                    echo json_encode(['status' => 'error', 'message' => 'Student not found']);
+                }
+                
+            } catch (Exception $e) {
+                $log_message = "[" . date('Y-m-d H:i:s') . "] Exception: " . $e->getMessage() . "\n";
+                file_put_contents(FCPATH.'application/logs/whatsapp_debug_'.date('Y-m-d').'.log', $log_message, FILE_APPEND);
+                echo json_encode(['status' => 'error', 'message' => 'Exception: ' . $e->getMessage()]);
+            }
+        } else {
+            $log_message = "[" . date('Y-m-d H:i:s') . "] Missing required parameters\n";
+            file_put_contents(FCPATH.'application/logs/whatsapp_debug_'.date('Y-m-d').'.log', $log_message, FILE_APPEND);
+            echo json_encode(['status' => 'error', 'message' => 'Missing parameters']);
+        }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
+    }
+}
+
 
 	private function send_whatsapp_notification($phone_number, $message) {
 		$wa_config = $this->m_api->get_whatsapp_config();
@@ -39,7 +104,7 @@ class Api extends CI_Controller {
 			CURLOPT_URL => $wa_config->api_url,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING => "",
-			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_MAXREDIRS => 3,
 			CURLOPT_TIMEOUT => 30,
 			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST => "POST",
@@ -104,6 +169,19 @@ class Api extends CI_Controller {
 		
 		return $message;
 	}
+	private function send_async_whatsapp($id_siswa, $keterangan, $is_manual = false) {
+    $base_url = base_url();
+    $async_url = $base_url . "api/whatsapp_notif_direct";
+    
+    $data = http_build_query([
+        'id_siswa' => $id_siswa,
+        'keterangan' => $keterangan,
+        'is_manual' => $is_manual ? '1' : '0'
+    ]);
+    $curl_command = "curl -X POST -d '{$data}' '{$async_url}' > /dev/null 2>&1 &";
+    exec($curl_command);
+}
+
 	public function manualabsensijson() {
 		if (isset($_GET['key']) && isset($_GET['iddev']) && isset($_GET['id_siswa'])) {
 			$key = $this->input->get('key');
@@ -119,6 +197,9 @@ class Api extends CI_Controller {
 					echo json_encode($notif);
 					return;
 				}
+				
+				// Get student name for response
+				$nama_siswa = strtoupper($ceksiswa[0]->nama);
 	
 				$device = $this->m_api->getdevice($iddev);
 				$count = count($device);
@@ -169,7 +250,7 @@ class Api extends CI_Controller {
 									($currentTime >= strtotime('00:00') && $currentTime <= $masuk2)) {
 									$absen = true;
 									$ket = "masuk";
-									$respon = "MASUK BERHASIL";
+									$respon = $nama_siswa; 
 								} else {
 									$notif = array('status' => 'failed', 'ket' => 'DILUAR WAKTU');
 									echo json_encode($notif);
@@ -179,11 +260,11 @@ class Api extends CI_Controller {
 								if ($currentTime >= $masuk1 && $currentTime <= $masuk2) {
 									$absen = true;
 									$ket = "masuk";
-									$respon = "MASUK BERHASIL";
+									$respon = $nama_siswa; 
 								} else if ($currentTime >= $keluar1 && $currentTime <= $keluar2) {
 									$absen = true;
 									$ket = "keluar";
-									$respon = "KELUAR";
+									$respon = $nama_siswa;
 								} else {
 									$notif = array('status' => 'failed', 'ket' => 'DILUAR WAKTU');
 									echo json_encode($notif);
@@ -226,16 +307,7 @@ class Api extends CI_Controller {
 										);
 										$this->m_api->insert_histori($histori);
 
-										$siswa_data = $ceksiswa[0]; 
-										if (!empty($siswa_data->telp)) {
-											$message = $this->create_whatsapp_message(
-												$siswa_data->nama, 
-												$ket, 
-												time(), 
-												true 
-											);
-											$this->send_whatsapp_notification($siswa_data->telp, $message);
-										}
+										$this->send_async_whatsapp($id_siswa, $ket, true);
 	
 										$notif = array('status' => 'success', 'ket' => $respon);
 										echo json_encode($notif);
@@ -317,9 +389,11 @@ class Api extends CI_Controller {
 				$ceksiswa = $this->m_api->checksiswa($siswa);
 				$countsiswa = 0;
 				$idsiswa = 0;
+				$nama_siswa = "";
 				foreach ($ceksiswa as $key => $value) {
 					$countsiswa++;
 					$idsiswa = $value->id_siswa;
+					$nama_siswa = strtoupper($value->nama); 
 				}
 	
 				$device = $this->m_api->getdevice($iddev);
@@ -338,7 +412,6 @@ class Api extends CI_Controller {
 							return;
 						}
 	
-						
 						$waktu = $this->m_api->get_waktu_by_day($hariIni);
 	
 						if ($waktu) {
@@ -370,30 +443,26 @@ class Api extends CI_Controller {
 								$ket = "";
 								$respon = "";
 	
-								
 								if ($masuk1 > $masuk2) { 
-								
 									if (($currentTime >= $masuk1 && $currentTime <= strtotime('23:59')) || 
 										($currentTime >= strtotime('00:00') && $currentTime <= $masuk2)) {
-										
 										$absen = true;
 										$ket = "masuk";
-										$respon = "MASUK BERHASIL                        .";
+										$respon = $nama_siswa;
 									} else {
 										$notif = array('status' => 'failed', 'ket' => 'DILUAR WAKTU                          .');
 										echo json_encode($notif);
 										return;
 									}
 								} else {
-								
 									if ($currentTime >= $masuk1 && $currentTime <= $masuk2) {
 										$absen = true;
 										$ket = "masuk";
-										$respon = "MASUK BERHASIL                        .";
+										$respon = $nama_siswa; 
 									} else if ($currentTime >= $keluar1 && $currentTime <= $keluar2) {
 										$absen = true;
 										$ket = "keluar";
-										$respon = "KELUAR                             .";
+										$respon = $nama_siswa;
 									} else {
 										$notif = array('status' => 'failed', 'ket' => 'DILUAR WAKTU                          .');
 										echo json_encode($notif);
@@ -401,7 +470,6 @@ class Api extends CI_Controller {
 									}
 								}
 	
-							
 								if ($absen) {
 									$today = strtotime("today");
 									$tomorrow = strtotime("tomorrow");
@@ -442,16 +510,8 @@ class Api extends CI_Controller {
 												'id_devices' => $iddev
 											);
 											$this->m_api->insert_histori($histori);
-											$siswa_data = $ceksiswa[0];
-											if (!empty($siswa_data->telp)) {
-												$message = $this->create_whatsapp_message(
-													$siswa_data->nama, 
-													$ket, 
-													time(), 
-													false 
-												);
-												$this->send_whatsapp_notification($siswa_data->telp, $message);
-											}
+
+											$this->send_async_whatsapp($idsiswa, $ket, false);
 
 											$notif = array('status' => 'success', 'ket' => $respon);
 											echo json_encode($notif);
@@ -483,6 +543,4 @@ class Api extends CI_Controller {
 			}
 		}
 	}
-	
-	
 }
